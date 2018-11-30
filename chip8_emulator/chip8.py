@@ -9,6 +9,11 @@ class Chip8:
     0xF00 - 0xFFF: display refresh
     """
 
+    MEMORY_LENGTH_BYTES = 4096
+    STACK_LENGTH_BYTES = 48
+    V_REGISTERS_LENGTH_BYTES = 16
+    I_REGISTER_LENGTH_BYTES = 2
+
     def __init__(self):
         self.memory = []
         self.stack = []
@@ -29,7 +34,7 @@ class Chip8:
     def skip_next_instruction_if_equals(self, v_index, instruction):
         pass
 
-    def skip_next_instructions_if_not_equals(self, v_index, instruction):
+    def skip_next_instruction_if_not_equals(self, v_index, instruction):
         pass
 
     def set_v_fixed_value(self, v_index, value):
@@ -38,14 +43,14 @@ class Chip8:
     def add_to_v(self, v_index, value):
         pass
 
-    def set_vx_to_vy(self, vx, vy):
+    def set_vx_to_vy(self, vx_index, vy_index):
         pass
 
-    def vx_or_vy(self, vx, vy):
+    def vx_or_vy(self, vx_index, vy_index):
         pass
 
-    def vx_and_vy(self, vx, vy):
+    def vx_and_vy(self, vx_index, vy_index):
         pass
 
-    def vx_xor_vy(self, vx, vy):
+    def vx_xor_vy(self, vx_index, vy_index):
         pass
