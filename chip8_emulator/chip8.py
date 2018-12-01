@@ -82,15 +82,15 @@ class Chip8:
         """ 8XY5 """
         pass
 
-    def shift_right_vx(self):
+    def shift_right_vx(self, vx_index):
         """ 8XY6 """
         pass
 
-    def subtract_vy_from_vx_negative(self, vx_index, vy_index):
+    def subtract_vx_from_vy_store_in_vx(self, vx_index, vy_index):
         """ 8XY7 """
         pass
 
-    def shift_left_vx(self):
+    def shift_left_vx(self, vx_index):
         """ 8XYE """
         pass
 
@@ -146,7 +146,7 @@ class Chip8:
         """ FX29 """
         pass
 
-    def store_bcd_of_vx_in_i_register(self, vx_index):
+    def store_binary_coded_decimal_of_vx_in_i_register(self, vx_index):
         """ FX33 """
         pass
 
@@ -154,6 +154,6 @@ class Chip8:
         """ FX55 """
         pass
 
-    def read_from_v0_to_vx_in_i_register(self, vx_index):
+    def read_v0_to_vx_from_i_register(self, vx_index):
         """ Fx65"""
         pass
