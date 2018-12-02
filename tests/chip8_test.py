@@ -137,13 +137,13 @@ class Chip8Test(unittest.TestCase):
         """ 7XNN """
         vx_index = 0x5
         v_registers = [None] * 16
-        v_registers[vx_index] = 0x78
+        v_registers[vx_index] = 0x38
         value_to_add = 0xAF
         chip8 = self._init_chip8(v_registers=v_registers)
 
         chip8.add_to_v(vx_index, value_to_add)
 
-        expected_vx_value = 0xFD
+        expected_vx_value = 0xE7
         actual_vx_value = chip8.v_registers[vx_index]
 
         self.assertEqual(expected_vx_value, actual_vx_value)
@@ -164,7 +164,7 @@ class Chip8Test(unittest.TestCase):
 
         self.assertEqual(expected_vx_value, actual_vx_value)
 
-    def test_vx_or_vy(self):
+    def test_set_vx_to_vx_or_vy(self):
         """ 8XY1 """
         vx_index = 0x2
         vy_index = 0x4
@@ -173,14 +173,14 @@ class Chip8Test(unittest.TestCase):
         v_registers[vy_index] = 0x81
         chip8 = self._init_chip8(v_registers=v_registers)
 
-        chip8.vx_or_vy(vx_index, vy_index)
+        chip8.set_vx_to_vx_or_vy(vx_index, vy_index)
 
         expected_vx_value = 0xDF
         actual_vx_value = chip8.v_registers[vx_index]
 
         self.assertEqual(expected_vx_value, actual_vx_value)
 
-    def test_vx_and_vy(self):
+    def test_set_vx_to_vx_and_vy(self):
         """ 8XY2 """
         vx_index = 0x3
         vy_index = 0xF
@@ -189,14 +189,14 @@ class Chip8Test(unittest.TestCase):
         v_registers[vy_index] = 0x37
         chip8 = self._init_chip8(v_registers=v_registers)
 
-        chip8.vx_and_vy(vx_index, vy_index)
+        chip8.set_vx_to_vx_and_vy(vx_index, vy_index)
 
         expected_vx_value = 0x20
         actual_vx_value = chip8.v_registers[vx_index]
 
         self.assertEqual(expected_vx_value, actual_vx_value)
 
-    def test_vx_xor_vy(self):
+    def test_set_vx_to_vx_xor_vy(self):
         """ 8XY3 """
         vx_index = 0x4
         vy_index = 0x5
@@ -205,7 +205,7 @@ class Chip8Test(unittest.TestCase):
         v_registers[vy_index] = 0x61
         chip8 = self._init_chip8(v_registers=v_registers)
 
-        chip8.vx_xor_vy(vx_index, vy_index)
+        chip8.set_vx_to_vx_xor_vy(vx_index, vy_index)
 
         expected_vx_value = 0x42
         actual_vx_value = chip8.v_registers[vx_index]
@@ -263,7 +263,7 @@ class Chip8Test(unittest.TestCase):
 
         chip8.subtract_vy_from_vx(vx_index, vy_index)
 
-        expected_vx_value = 0x17
+        expected_vx_value = 0x11
         actual_vx_value = chip8.v_registers[vx_index]
 
         expected_vf_value = 0x01
@@ -283,7 +283,7 @@ class Chip8Test(unittest.TestCase):
 
         chip8.subtract_vy_from_vx(vx_index, vy_index)
 
-        expected_vx_value = 0x17
+        expected_vx_value = 0x11
         actual_vx_value = chip8.v_registers[vx_index]
 
         expected_vf_value = 0x00
@@ -342,7 +342,7 @@ class Chip8Test(unittest.TestCase):
         expected_vx_value = 0x10
         actual_vx_value = chip8.v_registers[vx_index]
 
-        expected_vf_value = 0x10
+        expected_vf_value = 0x01
         actual_vf_value = chip8.v_registers[0xF]
 
         self.assertEqual(expected_vx_value, actual_vx_value)
@@ -375,7 +375,7 @@ class Chip8Test(unittest.TestCase):
         v_registers[vx_index] = 0x52
         chip8 = self._init_chip8(v_registers=v_registers)
 
-        chip8.shift_right_vx(vx_index)
+        chip8.shift_left_vx(vx_index)
 
         expected_vx_value = 0xA4
         actual_vx_value = chip8.v_registers[vx_index]
@@ -393,7 +393,7 @@ class Chip8Test(unittest.TestCase):
         v_registers[vx_index] = 0x71
         chip8 = self._init_chip8(v_registers=v_registers)
 
-        chip8.shift_right_vx(vx_index)
+        chip8.shift_left_vx(vx_index)
 
         expected_vx_value = 0xE2
         actual_vx_value = chip8.v_registers[vx_index]
@@ -414,7 +414,7 @@ class Chip8Test(unittest.TestCase):
         v_registers[vy_index] = 0x15
         chip8 = self._init_chip8(program_counter, v_registers=v_registers)
 
-        chip8.skip_next_instruction_if_vx_equals_vy(vx_index, vy_index)
+        chip8.skip_next_instruction_if_vx_not_equals_vy(vx_index, vy_index)
 
         expected_program_counter = 0x361
         actual_program_counter = chip8.program_counter
@@ -444,7 +444,7 @@ class Chip8Test(unittest.TestCase):
         new_address = 0x47F
         chip8.jump_to_address_plus_v0(new_address)
 
-        expected_program_counter = 0x7B5
+        expected_program_counter = 0x493
         actual_program_counter = chip8.program_counter
 
         self.assertEqual(expected_program_counter, actual_program_counter)
@@ -504,11 +504,12 @@ class Chip8Test(unittest.TestCase):
     def test_store_binary_coded_decimal_of_vx_in_i_register(self):
         """ FX33 """
         v_registers = [None] * 16
+        memory = [None] * 4096
         vx_index = 0x5
         v_registers[vx_index] = 0xAE
         i_register = 0xCE5
         chip8 = self._init_chip8(v_registers=v_registers,
-                                 i_register=i_register)
+                                 i_register=i_register, memory=memory)
 
         chip8.store_binary_coded_decimal_of_vx_in_i_register(vx_index)
 
@@ -529,12 +530,13 @@ class Chip8Test(unittest.TestCase):
     def test_store_from_v0_to_vx_in_i_register(self):
         """ FX55 """
         v_registers = [0x14, 0xF4, 0x61, 0xDE]
+        memory = [None] * 4096
         vx_index = 0x4
         i_register = 0x7A4
         chip8 = self._init_chip8(v_registers=v_registers,
-                                 i_register=i_register)
+                                 i_register=i_register, memory=memory)
 
-        chip8.store_binary_coded_decimal_of_vx_in_i_register(vx_index)
+        chip8.store_from_v0_to_vx_in_i_register(vx_index)
 
         expected_i0_memory_location_value = 0x14
         actual_i0_memory_location_value = chip8.memory[0x7A4]
@@ -565,7 +567,7 @@ class Chip8Test(unittest.TestCase):
         memory[0x5DC] = 0x81
         memory[0x5DD] = 0xDA
         chip8 = self._init_chip8(v_registers=v_registers,
-                                 i_register=i_register)
+                                 i_register=i_register, memory=memory)
 
         chip8.read_v0_to_vx_from_i_register(vx_index)
 
