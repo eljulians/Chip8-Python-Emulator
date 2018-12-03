@@ -204,3 +204,14 @@ class Chip8:
         for v_index in range(0, vx_index):
             address = addresses.pop(0)
             self.v_registers[v_index] = self.memory[address]
+
+    def _load_rom_to_memory(self, rom_path):
+        with open(rom_path, 'rb') as rom_handle:
+            for rom_byte in rom_handle.read():
+                self.memory.append(rom_byte)
+
+    def _parse_operation_and_parameters_from_opcode(self, opcode):
+        pass
+
+    def main(self):
+        pass
