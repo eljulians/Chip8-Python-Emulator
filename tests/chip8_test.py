@@ -621,6 +621,3 @@ class Chip8Test(unittest.TestCase):
         actual_memory = chip8.memory
 
         self.assertEqual(expected_memory, actual_memory)
-
-    def test_parse_operation_and_parameters_from_opcode(self):
-        self.fail('Not yet tested')

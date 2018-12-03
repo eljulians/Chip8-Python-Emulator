@@ -210,8 +210,5 @@ class Chip8:
             for rom_byte in rom_handle.read():
                 self.memory.append(rom_byte)
 
-    def _parse_operation_and_parameters_from_opcode(self, opcode):
-        pass
-
     def main(self):
         pass

@@ -2,12 +2,14 @@ import sys
 import unittest
 
 from .chip8_test import Chip8Test
+from .chip8_test import OpcodeParserTest
 
 
 def suite():
     suite = unittest.TestSuite()
 
     suite.addTest(unittest.makeSuite(Chip8Test))
+    suite.addTest(unittest.makeSuite(OpcodeParserTest))
 
     return suite
 
