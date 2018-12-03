@@ -1,4 +1,4 @@
 
-def _parse_operation_and_parameters_from_opcode(opcode):
-    pass
+def parse_operation_and_parameters(opcode):
+    return None, None
 
