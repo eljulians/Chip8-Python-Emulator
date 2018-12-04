@@ -1,24 +1,19 @@
 def parse_00_opcode(opcode):
-    if opcode[1] == 0xE0:
-        operation = '00e0'
-    elif opcode[1] == 0xEE:
-        operation = '00ee'
+    operation = _construct_operation(opcode, '0e')
 
     return operation, ()
 
 
 def parse_znnn_opcode(opcode):
     opcode_int = int.from_bytes(opcode, byteorder='big')
-    opcode_prefix = hex(opcode[0] >> 4)[2:]
-    operation = '{0}nnn'.format(opcode_prefix)
+    operation = _construct_operation(opcode, 'nn', 'n')
     parameters = opcode_int & 0x0FFF
 
     return operation, parameters
 
 
 def parse_zxkk_opcode(opcode):
-    opcode_prefix = hex(opcode[0] >> 4)[2:]
-    operation = '{0}xkk'.format(opcode_prefix)
+    operation = _construct_operation(opcode, 'xk', 'k')
     first_parameter = opcode[0] & 0x0F
     second_parameter = opcode[1]
 
@@ -26,9 +21,7 @@ def parse_zxkk_opcode(opcode):
 
 
 def parse_zxyz_opcode(opcode):
-    opcode_prefix = hex(opcode[0] >> 4)[2:]
-    opcode_suffix = hex(opcode[1] & 0x0F)[2:]
-    operation = '{0}xy{1}'.format(opcode_prefix, opcode_suffix)
+    operation = _construct_operation(opcode, 'xy')
     first_parameter = opcode[0] & 0x0F
     second_parameter = opcode[1] >> 4
 
@@ -45,8 +38,10 @@ def parse_zxyn_opcode(opcode):
 
 
 def parse_zxzz_opcode(opcode):
-    opcode_prefix = hex(opcode[0] >> 4)[2:]
+    opcode_prefix = _get_byte_first_nibble_hex(opcode[0])
     opcode_suffix = '{:02x}'.format(opcode[1])
+    opcode_suffix = _get_byte_first_nibble_hex(opcode[1]) \
+        + _get_byte_last_nibble_hex(opcode[1])
     operation = '{0}x{1}'.format(opcode_prefix, opcode_suffix)
 
     parameter = opcode[0] & 0x0F
@@ -54,7 +49,7 @@ def parse_zxzz_opcode(opcode):
     return operation, parameter
 
 
-opcode_parser_functions_per_prefix = {
+OPCODE_PARSER_FUNCTIONS_PER_PREFIX = {
     0x0: parse_00_opcode,
     0x1: parse_znnn_opcode,
     0x2: parse_znnn_opcode,
@@ -74,10 +69,29 @@ opcode_parser_functions_per_prefix = {
 }
 
 
+def _construct_operation(opcode, constant_part, last_nibble=None):
+    suffix = last_nibble if last_nibble is not None \
+        else _get_byte_last_nibble_hex(opcode[1])
+
+    return '{0}{1}{2}'.format(
+        _get_byte_first_nibble_hex(opcode[0]),
+        constant_part,
+        suffix,
+    )
+
+
+def _get_byte_first_nibble_hex(byte):
+    return hex(byte >> 4)[2:]
+
+
+def _get_byte_last_nibble_hex(byte):
+    return hex(byte & 0x0F)[2:]
+
+
 def parse_operation_and_parameters(opcode):
     opcode_prefix_nibble = opcode[0] >> 4
 
-    parse_function = opcode_parser_functions_per_prefix[opcode_prefix_nibble]
+    parse_function = OPCODE_PARSER_FUNCTIONS_PER_PREFIX[opcode_prefix_nibble]
     operation, parameters = parse_function(opcode)
 
     return operation, parameters
