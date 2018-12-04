@@ -14,7 +14,7 @@ def parse_znnn_opcode(opcode):
 
 def parse_zxkk_opcode(opcode):
     operation = _construct_operation(opcode, 'xk', 'k')
-    first_parameter = opcode[0] & 0x0F
+    first_parameter = _get_byte_last_nibble_int(opcode[0])
     second_parameter = opcode[1]
 
     return operation, (first_parameter, second_parameter)
@@ -22,29 +22,28 @@ def parse_zxkk_opcode(opcode):
 
 def parse_zxyz_opcode(opcode):
     operation = _construct_operation(opcode, 'xy')
-    first_parameter = opcode[0] & 0x0F
-    second_parameter = opcode[1] >> 4
+    first_parameter = _get_byte_last_nibble_int(opcode[0])
+    second_parameter = _get_byte_first_nibble_int(opcode[1])
 
     return operation, (first_parameter, second_parameter)
 
 
 def parse_zxyn_opcode(opcode):
     operation = 'dxyn'
-    first_parameter = opcode[0] & 0x0F
-    second_parameter = opcode[1] >> 4
-    third_parameter = opcode[1] & 0x0F
+    first_parameter = _get_byte_last_nibble_int(opcode[0])
+    second_parameter = _get_byte_first_nibble_int(opcode[1])
+    third_parameter = _get_byte_last_nibble_int(opcode[1])
 
     return operation, (first_parameter, second_parameter, third_parameter)
 
 
 def parse_zxzz_opcode(opcode):
     opcode_prefix = _get_byte_first_nibble_hex(opcode[0])
-    opcode_suffix = '{:02x}'.format(opcode[1])
     opcode_suffix = _get_byte_first_nibble_hex(opcode[1]) \
         + _get_byte_last_nibble_hex(opcode[1])
     operation = '{0}x{1}'.format(opcode_prefix, opcode_suffix)
 
-    parameter = opcode[0] & 0x0F
+    parameter = _get_byte_last_nibble_int(opcode[0])
 
     return operation, parameter
 
@@ -80,6 +79,14 @@ def _construct_operation(opcode, constant_part, last_nibble=None):
     )
 
 
+def _get_byte_first_nibble_int(byte):
+    return byte >> 4
+
+
+def _get_byte_last_nibble_int(byte):
+    return byte & 0x0F
+
+
 def _get_byte_first_nibble_hex(byte):
     return hex(byte >> 4)[2:]
 
@@ -89,7 +96,7 @@ def _get_byte_last_nibble_hex(byte):
 
 
 def parse_operation_and_parameters(opcode):
-    opcode_prefix_nibble = opcode[0] >> 4
+    opcode_prefix_nibble = _get_byte_first_nibble_int(opcode[0])
 
     parse_function = OPCODE_PARSER_FUNCTIONS_PER_PREFIX[opcode_prefix_nibble]
     operation, parameters = parse_function(opcode)
