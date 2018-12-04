@@ -1,4 +1,4 @@
-def parse_0_prefix_operation_and_parameters(opcode):
+def parse_00_opcode(opcode):
     if opcode[1] == 0xE0:
         operation = '00e0'
     elif opcode[1] == 0xEE:
@@ -7,105 +7,35 @@ def parse_0_prefix_operation_and_parameters(opcode):
     return operation, ()
 
 
-def parse_1_prefix_operation_and_parameters(opcode):
+def parse_znnn_opcode(opcode):
     opcode_int = int.from_bytes(opcode, byteorder='big')
-    operation = '1nnn'
+    opcode_prefix = hex(opcode[0] >> 4)[2:]
+    operation = '{0}nnn'.format(opcode_prefix)
     parameters = opcode_int & 0x0FFF
 
     return operation, parameters
 
 
-def parse_2_prefix_operation_and_parameters(opcode):
-    opcode_int = int.from_bytes(opcode, byteorder='big')
-    operation = '2nnn'
-    parameters = opcode_int & 0x0FFF
-
-    return operation, parameters
-
-
-def parse_3_prefix_operation_and_parameters(opcode):
-    operation = '3xkk'
+def parse_zxkk_opcode(opcode):
+    opcode_prefix = hex(opcode[0] >> 4)[2:]
+    operation = '{0}xkk'.format(opcode_prefix)
     first_parameter = opcode[0] & 0x0F
     second_parameter = opcode[1]
 
     return operation, (first_parameter, second_parameter)
 
 
-def parse_4_prefix_operation_and_parameters(opcode):
-    operation = '4xkk'
-    first_parameter = opcode[0] & 0x0F
-    second_parameter = opcode[1]
-
-    return operation, (first_parameter, second_parameter)
-
-
-def parse_5_prefix_operation_and_parameters(opcode):
-    operation = '5xy0'
-    first_parameter = opcode[0] & 0x0F
-    second_parameter = opcode[1] >> 4
-
-    return operation, (first_parameter, second_parameter)
-
-
-def parse_6_prefix_operation_and_parameters(opcode):
-    operation = '6xkk'
-    first_parameter = opcode[0] & 0x0F
-    second_parameter = opcode[1]
-
-    return operation, (first_parameter, second_parameter)
-
-
-def parse_7_prefix_operation_and_parameters(opcode):
-    operation = '7xkk'
-    first_parameter = opcode[0] & 0x0F
-    second_parameter = opcode[1]
-
-    return operation, (first_parameter, second_parameter)
-
-
-def parse_8_prefix_operation_and_parameters(opcode):
+def parse_zxyz_opcode(opcode):
+    opcode_prefix = hex(opcode[0] >> 4)[2:]
     opcode_suffix = hex(opcode[1] & 0x0F)[2:]
-    operation = '8xy{0}'.format(opcode_suffix)
-
+    operation = '{0}xy{1}'.format(opcode_prefix, opcode_suffix)
     first_parameter = opcode[0] & 0x0F
     second_parameter = opcode[1] >> 4
 
     return operation, (first_parameter, second_parameter)
 
 
-def parse_9_prefix_operation_and_parameters(opcode):
-    operation = '9xy0'
-    first_parameter = opcode[0] & 0x0F
-    second_parameter = opcode[1] >> 4
-
-    return operation, (first_parameter, second_parameter)
-
-
-def parse_A_prefix_operation_and_parameters(opcode):
-    opcode_int = int.from_bytes(opcode, byteorder='big')
-    operation = 'annn'
-    parameter = opcode_int & 0x0FFF
-
-    return operation, parameter
-
-
-def parse_B_prefix_operation_and_parameters(opcode):
-    opcode_int = int.from_bytes(opcode, byteorder='big')
-    operation = 'bnnn'
-    parameter = opcode_int & 0x0FFF
-
-    return operation, parameter
-
-
-def parse_C_prefix_operation_and_parameters(opcode):
-    operation = 'cxkk'
-    first_parameter = opcode[0] & 0x0F
-    second_parameter = opcode[1]
-
-    return operation, (first_parameter, second_parameter)
-
-
-def parse_D_prefix_operation_and_parameters(opcode):
+def parse_zxyn_opcode(opcode):
     operation = 'dxyn'
     first_parameter = opcode[0] & 0x0F
     second_parameter = opcode[1] >> 4
@@ -114,50 +44,40 @@ def parse_D_prefix_operation_and_parameters(opcode):
     return operation, (first_parameter, second_parameter, third_parameter)
 
 
-def parse_E_prefix_operation_and_parameters(opcode):
-    if opcode[1] == 0x9E:
-        operation = 'ex9e'
-    elif opcode[1] == 0xA1:
-        operation = 'exa1'
-
-    parameter = opcode[0] & 0x0F
-
-    return operation, parameter
-
-
-def parse_F_prefix_operation_and_parameters(opcode):
-    opcode_suffix = hex(opcode[1])[2:]
+def parse_zxzz_opcode(opcode):
+    opcode_prefix = hex(opcode[0] >> 4)[2:]
     opcode_suffix = '{:02x}'.format(opcode[1])
-    operation = 'fx{0}'.format(opcode_suffix)
+    operation = '{0}x{1}'.format(opcode_prefix, opcode_suffix)
 
     parameter = opcode[0] & 0x0F
 
     return operation, parameter
 
-parse_functions = [
-    parse_0_prefix_operation_and_parameters,
-    parse_1_prefix_operation_and_parameters,
-    parse_2_prefix_operation_and_parameters,
-    parse_3_prefix_operation_and_parameters,
-    parse_4_prefix_operation_and_parameters,
-    parse_5_prefix_operation_and_parameters,
-    parse_6_prefix_operation_and_parameters,
-    parse_7_prefix_operation_and_parameters,
-    parse_8_prefix_operation_and_parameters,
-    parse_9_prefix_operation_and_parameters,
-    parse_A_prefix_operation_and_parameters,
-    parse_B_prefix_operation_and_parameters,
-    parse_C_prefix_operation_and_parameters,
-    parse_D_prefix_operation_and_parameters,
-    parse_E_prefix_operation_and_parameters,
-    parse_F_prefix_operation_and_parameters,
-]
+
+opcode_parser_functions_per_prefix = {
+    0x0: parse_00_opcode,
+    0x1: parse_znnn_opcode,
+    0x2: parse_znnn_opcode,
+    0x3: parse_zxkk_opcode,
+    0x4: parse_zxkk_opcode,
+    0x5: parse_zxyz_opcode,
+    0x6: parse_zxkk_opcode,
+    0x7: parse_zxkk_opcode,
+    0x8: parse_zxyz_opcode,
+    0x9: parse_zxyz_opcode,
+    0xA: parse_znnn_opcode,
+    0xB: parse_znnn_opcode,
+    0xC: parse_zxkk_opcode,
+    0xD: parse_zxyn_opcode,
+    0xE: parse_zxzz_opcode,
+    0xF: parse_zxzz_opcode,
+}
 
 
 def parse_operation_and_parameters(opcode):
     opcode_prefix_nibble = opcode[0] >> 4
 
-    parse_function = parse_functions[opcode_prefix_nibble]
+    parse_function = opcode_parser_functions_per_prefix[opcode_prefix_nibble]
     operation, parameters = parse_function(opcode)
 
     return operation, parameters
