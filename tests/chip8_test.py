@@ -1,4 +1,5 @@
 import unittest
+from unittest import mock
 from chip8_emulator.chip8 import Chip8
 
 
@@ -601,5 +602,32 @@ class Chip8Test(unittest.TestCase):
 
         self.assertEqual(expected_opcode, actual_opcode)
 
-    def test_execute_operation(self):
-        self.fail('Not yet tested')
+    @mock.patch('chip8_emulator.chip8.Chip8._1nnn')
+    def test_execute_operation__1nnn(self, mocked_1nnn):
+        operation = '1nnn'
+        parameters = ()
+        chip8 = self._init_chip8()
+
+        chip8._execute_operation(operation, parameters)
+
+        self.assertTrue(mocked_1nnn.called)
+
+    @mock.patch('chip8_emulator.chip8.Chip8._3xnn')
+    def test_execute_operation__3xnn(self, mocked_3xnn):
+        operation = '3xnn'
+        parameters = ()
+        chip8 = self._init_chip8()
+
+        chip8._execute_operation(operation, parameters)
+
+        self.assertTrue(mocked_3xnn.called)
+
+    @mock.patch('chip8_emulator.chip8.Chip8._8xy3')
+    def test_execute_operation__8xy3(self, mocked_8xy3):
+        operation = '8xy3'
+        parameters = ()
+        chip8 = self._init_chip8()
+
+        chip8._execute_operation(operation, parameters)
+
+        self.assertTrue(mocked_8xy3.called)

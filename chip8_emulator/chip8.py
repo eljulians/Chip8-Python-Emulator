@@ -186,7 +186,9 @@ class Chip8:
         return bytes([opcode_first_byte, opcode_last_byte])
 
     def _execute_operation(self, operation, parameters):
-        pass
+        operation_name_in_class = '_' + operation
+        operation_function = getattr(self, operation_name_in_class)
+        operation_function(parameters)
 
     def main(self):
         opcode = self._get_current_opcode()
