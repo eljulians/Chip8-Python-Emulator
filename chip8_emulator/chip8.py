@@ -1,3 +1,6 @@
+from .opcode_parser import parse_operation_and_parameters
+
+
 class Chip8:
     """
     Memory map
@@ -210,5 +213,16 @@ class Chip8:
             for rom_byte in rom_handle.read():
                 self.memory.append(rom_byte)
 
-    def main(self):
+    def _get_current_opcode(self):
+        opcode_first_byte = self.memory[self.program_counter]
+        opcode_last_byte = self.memory[self.program_counter + 1]
+
+        return bytes([opcode_first_byte, opcode_last_byte])
+
+    def _execute_operation(self, operation, parameters):
         pass
+
+    def main(self):
+        opcode = self._get_current_opcode()
+        operation, parameters = parse_operation_and_parameters(opcode)
+        self._execute_operation(operation, parameters)
