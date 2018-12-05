@@ -77,7 +77,7 @@ class Chip8Test(unittest.TestCase):
         value_to_compare = 0xAE
         chip8._3xnn(vx_index, value_to_compare)
 
-        expected_program_counter = 0x31C
+        expected_program_counter = 0x31E
         actual_program_counter = chip8.program_counter
 
         self.assertEqual(expected_program_counter, actual_program_counter)
@@ -92,7 +92,7 @@ class Chip8Test(unittest.TestCase):
         value_to_compare = 0xAE
         chip8._4xnn(vx_index, value_to_compare)
 
-        expected_program_counter = 0xBB0
+        expected_program_counter = 0xBB2
         actual_program_counter = chip8.program_counter
 
         self.assertEqual(expected_program_counter, actual_program_counter)
@@ -108,7 +108,7 @@ class Chip8Test(unittest.TestCase):
 
         chip8._5xy0(vx_index, vy_index)
 
-        expected_program_counter = 0x500
+        expected_program_counter = 0x502
         actual_program_counter = chip8.program_counter
 
         self.assertEqual(expected_program_counter, actual_program_counter)
@@ -393,7 +393,7 @@ class Chip8Test(unittest.TestCase):
 
         chip8._9xy0(vx_index, vy_index)
 
-        expected_program_counter = 0x361
+        expected_program_counter = 0x363
         actual_program_counter = chip8.program_counter
 
         self.assertEqual(expected_program_counter, actual_program_counter)
@@ -448,7 +448,7 @@ class Chip8Test(unittest.TestCase):
     def test_fx18(self):
         self.fail('Not yet tested')
 
-    def test_fx15(self):
+    def test_fx1e(self):
         v_registers = [None] * 16
         vx_index = 0x5
         v_registers[vx_index] = 0xAE
@@ -456,7 +456,7 @@ class Chip8Test(unittest.TestCase):
         chip8 = self._init_chip8(v_registers=v_registers,
                                  i_register=i_register)
 
-        chip8._fx15(vx_index)
+        chip8._fx1e(vx_index)
 
         expected_i_register = 0xCC3
         actual_i_register = chip8.i_register

@@ -42,33 +42,39 @@ class Chip8:
 
     def _3xnn(self, v_index, instruction):
         if self.v_registers[v_index] == instruction:
-            self.program_counter += 2
+            self._increment_program_counter(2)
 
     def _4xnn(self, v_index, instruction):
         if self.v_registers[v_index] != instruction:
-            self.program_counter += 2
+            self._increment_program_counter(2)
 
     def _5xy0(self, vx_index, vy_index):
         if self.v_registers[vx_index] == self.v_registers[vy_index]:
-            self.program_counter += 2
+            self._increment_program_counter(2)
 
     def _6xnn(self, v_index, value):
         self.v_registers[v_index] = value
+        self._increment_program_counter(1)
 
     def _7xnn(self, v_index, value):
         self.v_registers[v_index] += value
+        self._increment_program_counter(1)
 
     def _8xy0(self, vx_index, vy_index):
         self.v_registers[vx_index] = self.v_registers[vy_index]
+        self._increment_program_counter(1)
 
     def _8xy1(self, vx_index, vy_index):
         self.v_registers[vx_index] |= self.v_registers[vy_index]
+        self._increment_program_counter(1)
 
     def _8xy2(self, vx_index, vy_index):
         self.v_registers[vx_index] &= self.v_registers[vy_index]
+        self._increment_program_counter(1)
 
     def _8xy3(self, vx_index, vy_index):
         self.v_registers[vx_index] ^= self.v_registers[vy_index]
+        self._increment_program_counter(1)
 
     def _8xy4(self, vx_index, vy_index):
         addition_result = self.v_registers[vx_index] \
@@ -76,6 +82,8 @@ class Chip8:
         addition_result_last_8_bits = addition_result & 0x0FF
         self.v_registers[vx_index] = addition_result_last_8_bits
         self.v_registers[0xF] = 0x00 if addition_result <= 0xFF else 0x01
+
+        self._increment_program_counter(1)
 
     def _8xy5(self, vx_index, vy_index):
         vx_value = self.v_registers[vx_index]
@@ -86,12 +94,16 @@ class Chip8:
         subtraction_result_abs = abs(vx_value - vy_value)
         self.v_registers[vx_index] = subtraction_result_abs
 
+        self._increment_program_counter(1)
+
     def _8xy6(self, vx_index):
         vx_value = self.v_registers[vx_index]
         vx_last_bit = vx_value & 0x01
         right_shifted_vx_value = vx_value >> 1
         self.v_registers[vx_index] = right_shifted_vx_value
         self.v_registers[0xF] = vx_last_bit
+
+        self._increment_program_counter(1)
 
     def _8xy7(self, vx_index, vy_index):
         vx_value = self.v_registers[vx_index]
@@ -102,6 +114,8 @@ class Chip8:
         subtraction_result_abs = abs(vy_value - vx_value)
         self.v_registers[vx_index] = subtraction_result_abs
 
+        self._increment_program_counter(1)
+
     def _8xye(self, vx_index):
         vx_value = self.v_registers[vx_index]
         vx_last_bit = vx_value & 0x01
@@ -109,12 +123,15 @@ class Chip8:
         self.v_registers[vx_index] = left_shifted_vx_value
         self.v_registers[0xF] = vx_last_bit
 
+        self._increment_program_counter(1)
+
     def _9xy0(self, vx_index, vy_index):
         if self.v_registers[vx_index] != self.v_registers[vy_index]:
-            self.program_counter += 2
+            self._increment_program_counter(2)
 
     def _annn(self, value):
         self.i_register = value
+        self._increment_program_counter(1)
 
     def _bnnn(self, address):
         self.program_counter = address + self.v_registers[0x0]
@@ -143,8 +160,9 @@ class Chip8:
     def _fx18(self, vx_index):
         pass
 
-    def _fx15(self, vx_index):
+    def _fx1e(self, vx_index):
         self.i_register += self.v_registers[vx_index]
+        self._increment_program_counter(1)
 
     def _fx29(self, vx_index):
         pass
@@ -184,6 +202,9 @@ class Chip8:
         opcode_last_byte = self.memory[self.program_counter + 1]
 
         return bytes([opcode_first_byte, opcode_last_byte])
+
+    def _increment_program_counter(self, byte_units):
+        self.program_counter += byte_units * 2
 
     def _execute_operation(self, operation, parameters):
         operation_name_in_class = '_' + operation
