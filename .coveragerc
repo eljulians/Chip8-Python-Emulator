@@ -1,0 +1,9 @@
+[run]
+branch = True
+source = chip8_emulator/
+omit =
+    chip8_emulator/__init__.py
+    chip8_emulator/__main__.py
+
+[html]
+directory = reports/coverage

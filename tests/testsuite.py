@@ -2,7 +2,7 @@ import sys
 import unittest
 
 from .chip8_test import Chip8Test
-from .chip8_test import OpcodeParserTest
+from .opcode_parser_test import OpcodeParserTest
 
 
 def suite():
