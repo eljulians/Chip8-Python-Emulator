@@ -43,14 +43,20 @@ class Chip8:
     def _3xnn(self, v_index, instruction):
         if self.v_registers[v_index] == instruction:
             self._increment_program_counter(2)
+        else:
+            self._increment_program_counter(1)
 
     def _4xnn(self, v_index, instruction):
         if self.v_registers[v_index] != instruction:
             self._increment_program_counter(2)
+        else:
+            self._increment_program_counter(1)
 
     def _5xy0(self, vx_index, vy_index):
         if self.v_registers[vx_index] == self.v_registers[vy_index]:
             self._increment_program_counter(2)
+        else:
+            self._increment_program_counter(1)
 
     def _6xnn(self, v_index, value):
         self.v_registers[v_index] = value
@@ -128,6 +134,8 @@ class Chip8:
     def _9xy0(self, vx_index, vy_index):
         if self.v_registers[vx_index] != self.v_registers[vy_index]:
             self._increment_program_counter(2)
+        else:
+            self._increment_program_counter(1)
 
     def _annn(self, value):
         self.i_register = value
