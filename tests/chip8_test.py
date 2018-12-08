@@ -6,7 +6,7 @@ from chip8_emulator.chip8 import Chip8
 class Chip8Test(unittest.TestCase):
 
     def _init_chip8(self, program_counter=0x200, stack_pointer=0xEA0, stack=[],
-                    v_registers=[], i_register=None, memory=[]):
+                    v_registers=[], i_register=None, memory=[None] * 4096):
         chip8 = Chip8()
         chip8.program_counter = program_counter
         chip8.stack_pointer = stack_pointer
@@ -67,7 +67,7 @@ class Chip8Test(unittest.TestCase):
         self.assertEqual(expected_stack_pointer, actual_stack_pointer)
         self.assertEqual(expected_stack, actual_stack)
 
-    def test_3xnn__equals(self):
+    def test_3xkk__equals(self):
         program_counter = 0x31A
         v_registers = [None] * 16
         vx_index = 0x5
@@ -75,14 +75,14 @@ class Chip8Test(unittest.TestCase):
         chip8 = self._init_chip8(program_counter, v_registers=v_registers)
 
         value_to_compare = 0xAE
-        chip8._3xnn(vx_index, value_to_compare)
+        chip8._3xkk(vx_index, value_to_compare)
 
         expected_program_counter = 0x31E
         actual_program_counter = chip8.program_counter
 
         self.assertEqual(expected_program_counter, actual_program_counter)
 
-    def test_3xnn__not_equals(self):
+    def test_3xkk__not_equals(self):
         program_counter = 0x31A
         v_registers = [None] * 16
         vx_index = 0x5
@@ -90,14 +90,14 @@ class Chip8Test(unittest.TestCase):
         chip8 = self._init_chip8(program_counter, v_registers=v_registers)
 
         value_to_compare = 0xAF
-        chip8._3xnn(vx_index, value_to_compare)
+        chip8._3xkk(vx_index, value_to_compare)
 
         expected_program_counter = 0x31C
         actual_program_counter = chip8.program_counter
 
         self.assertEqual(expected_program_counter, actual_program_counter)
 
-    def test_4xnn__not_equals(self):
+    def test_4xkk__not_equals(self):
         program_counter = 0xBAE
         v_registers = [None] * 16
         vx_index = 0x2
@@ -105,14 +105,14 @@ class Chip8Test(unittest.TestCase):
         chip8 = self._init_chip8(program_counter, v_registers=v_registers)
 
         value_to_compare = 0xAE
-        chip8._4xnn(vx_index, value_to_compare)
+        chip8._4xkk(vx_index, value_to_compare)
 
         expected_program_counter = 0xBB2
         actual_program_counter = chip8.program_counter
 
         self.assertEqual(expected_program_counter, actual_program_counter)
 
-    def test_4xnn__equals(self):
+    def test_4xkk__equals(self):
         program_counter = 0xBAE
         v_registers = [None] * 16
         vx_index = 0x2
@@ -120,7 +120,7 @@ class Chip8Test(unittest.TestCase):
         chip8 = self._init_chip8(program_counter, v_registers=v_registers)
 
         value_to_compare = 0x14
-        chip8._4xnn(vx_index, value_to_compare)
+        chip8._4xkk(vx_index, value_to_compare)
 
         expected_program_counter = 0xBB0
         actual_program_counter = chip8.program_counter
@@ -159,27 +159,27 @@ class Chip8Test(unittest.TestCase):
 
         self.assertEqual(expected_program_counter, actual_program_counter)
 
-    def test_6xnn(self):
+    def test_6xkk(self):
         v_registers = [None] * 16
         vx_index = 0xA
         value = 0xEA
         chip8 = self._init_chip8(v_registers=v_registers)
 
-        chip8._6xnn(vx_index, value)
+        chip8._6xkk(vx_index, value)
 
         expected_vx = value
         actual_vx = chip8.v_registers[vx_index]
 
         self.assertEqual(expected_vx, actual_vx)
 
-    def test_7xnn(self):
+    def test_7xkk(self):
         vx_index = 0x5
         v_registers = [None] * 16
         v_registers[vx_index] = 0x38
         value_to_add = 0xAF
         chip8 = self._init_chip8(v_registers=v_registers)
 
-        chip8._7xnn(vx_index, value_to_add)
+        chip8._7xkk(vx_index, value_to_add)
 
         expected_vx_value = 0xE7
         actual_vx_value = chip8.v_registers[vx_index]
@@ -486,7 +486,7 @@ class Chip8Test(unittest.TestCase):
 
         self.assertEqual(expected_program_counter, actual_program_counter)
 
-    def test_cxnn(self):
+    def test_cxkk(self):
         self.fail('Not yet tested')
 
     def test_dxyn(self):
@@ -615,7 +615,8 @@ class Chip8Test(unittest.TestCase):
 
         chip8._load_rom_to_memory(rom_path)
 
-        expected_memory = [
+        expected_memory = [None] * 4096
+        expected_memory[0x200:0x200] = [
             0x6A, 0x2, 0x6B, 0xC, 0x6C, 0x3F, 0x6D, 0xC, 0xA2, 0xEA,
             0xDA, 0xB6, 0xDC, 0xD6, 0x6E, 0x0, 0x22, 0xD4, 0x66, 0x3,
             0x68, 0x2, 0x60, 0x60, 0xF0, 0x15, 0xF0, 0x7, 0x30, 0x0,
@@ -642,6 +643,7 @@ class Chip8Test(unittest.TestCase):
             0xD4, 0x55, 0x0, 0xEE, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
             0x80, 0x0, 0x0, 0x0, 0x0, 0x0
         ]
+        del expected_memory[4096:]
         actual_memory = chip8.memory
 
         self.assertEqual(expected_memory, actual_memory)
@@ -674,15 +676,15 @@ class Chip8Test(unittest.TestCase):
 
         self.assertTrue(mocked_1nnn.called)
 
-    @mock.patch('chip8_emulator.chip8.Chip8._3xnn')
-    def test_execute_operation__3xnn(self, mocked_3xnn):
-        operation = '3xnn'
+    @mock.patch('chip8_emulator.chip8.Chip8._3xkk')
+    def test_execute_operation__3xkk(self, mocked_3xkk):
+        operation = '3xkk'
         parameters = ()
         chip8 = self._init_chip8()
 
         chip8._execute_operation(operation, parameters)
 
-        self.assertTrue(mocked_3xnn.called)
+        self.assertTrue(mocked_3xkk.called)
 
     @mock.patch('chip8_emulator.chip8.Chip8._8xy3')
     def test_execute_operation__8xy3(self, mocked_8xy3):

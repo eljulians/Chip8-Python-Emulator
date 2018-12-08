@@ -18,11 +18,11 @@ class Chip8:
     I_REGISTER_LENGTH_BYTES = 2
 
     def __init__(self):
-        self.memory = []
+        self.memory = [None] * 0xE9F
         self.stack = []
         self.stack_pointer = 0
-        self.program_counter = 0
-        self.v_registers = []
+        self.program_counter = 0x200
+        self.v_registers = [None] * self.V_REGISTERS_LENGTH_BYTES
         self.i_register = None
 
     def _00e0(self):
@@ -40,13 +40,13 @@ class Chip8:
         self.stack_pointer += 1
         self.program_counter = address
 
-    def _3xnn(self, v_index, instruction):
+    def _3xkk(self, v_index, instruction):
         if self.v_registers[v_index] == instruction:
             self._increment_program_counter(2)
         else:
             self._increment_program_counter(1)
 
-    def _4xnn(self, v_index, instruction):
+    def _4xkk(self, v_index, instruction):
         if self.v_registers[v_index] != instruction:
             self._increment_program_counter(2)
         else:
@@ -58,11 +58,11 @@ class Chip8:
         else:
             self._increment_program_counter(1)
 
-    def _6xnn(self, v_index, value):
+    def _6xkk(self, v_index, value):
         self.v_registers[v_index] = value
         self._increment_program_counter(1)
 
-    def _7xnn(self, v_index, value):
+    def _7xkk(self, v_index, value):
         self.v_registers[v_index] += value
         self._increment_program_counter(1)
 
@@ -144,7 +144,7 @@ class Chip8:
     def _bnnn(self, address):
         self.program_counter = address + self.v_registers[0x0]
 
-    def _cxnn(self, value):
+    def _cxkk(self, value):
         pass
 
     def _dxyn(self, vx_coord, vy_coord, sprite_height):
@@ -201,9 +201,12 @@ class Chip8:
             self.v_registers[v_index] = self.memory[address]
 
     def _load_rom_to_memory(self, rom_path):
+        memory_index = 0x200
+
         with open(rom_path, 'rb') as rom_handle:
             for rom_byte in rom_handle.read():
-                self.memory.append(rom_byte)
+                self.memory[memory_index] = rom_byte
+                memory_index += 1
 
     def _get_current_opcode(self):
         opcode_first_byte = self.memory[self.program_counter]
