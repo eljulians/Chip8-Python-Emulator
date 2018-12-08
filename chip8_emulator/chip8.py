@@ -218,9 +218,32 @@ class Chip8:
         self.program_counter += byte_units * 2
 
     def _execute_operation(self, operation, parameters):
+        """
+        TODO: refactor operation calling
+        """
         operation_name_in_class = '_' + operation
         operation_function = getattr(self, operation_name_in_class)
-        operation_function(parameters)
+        if operation_name_in_class.startswith('_00') \
+                or operation_name_in_class.startswith('_e') \
+                or operation_name_in_class.startswith('_f'):
+            operation_function()
+        elif operation_name_in_class.startswith('_0') \
+                or operation_name_in_class.startswith('_1') \
+                or operation_name_in_class.startswith('_2') \
+                or operation_name_in_class.startswith('_a') \
+                or operation_name_in_class.startswith('_b'):
+            operation_function(parameters[0])
+        elif operation_name_in_class.startswith('_3') \
+                or operation_name_in_class.startswith('_4') \
+                or operation_name_in_class.startswith('_5') \
+                or operation_name_in_class.startswith('_6') \
+                or operation_name_in_class.startswith('_7') \
+                or operation_name_in_class.startswith('_8') \
+                or operation_name_in_class.startswith('_9') \
+                or operation_name_in_class.startswith('_c'):
+            operation_function(parameters[0], parameters[1])
+        elif operation_name_in_class.startswith('_d'):
+            operation_function(parameters[0], parameters[1], parameters[2])
 
     def main(self):
         opcode = self._get_current_opcode()

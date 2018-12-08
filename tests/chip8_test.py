@@ -669,7 +669,7 @@ class Chip8Test(unittest.TestCase):
     @mock.patch('chip8_emulator.chip8.Chip8._1nnn')
     def test_execute_operation__1nnn(self, mocked_1nnn):
         operation = '1nnn'
-        parameters = ()
+        parameters = (0x4AE)
         chip8 = self._init_chip8()
 
         chip8._execute_operation(operation, parameters)
@@ -679,7 +679,7 @@ class Chip8Test(unittest.TestCase):
     @mock.patch('chip8_emulator.chip8.Chip8._3xkk')
     def test_execute_operation__3xkk(self, mocked_3xkk):
         operation = '3xkk'
-        parameters = ()
+        parameters = (0x4, 0xEA)
         chip8 = self._init_chip8()
 
         chip8._execute_operation(operation, parameters)
@@ -689,7 +689,7 @@ class Chip8Test(unittest.TestCase):
     @mock.patch('chip8_emulator.chip8.Chip8._8xy3')
     def test_execute_operation__8xy3(self, mocked_8xy3):
         operation = '8xy3'
-        parameters = ()
+        parameters = (0x1, 0x2)
         chip8 = self._init_chip8()
 
         chip8._execute_operation(operation, parameters)
