@@ -669,7 +669,7 @@ class Chip8Test(unittest.TestCase):
     @mock.patch('chip8_emulator.chip8.Chip8._1nnn')
     def test_execute_operation__1nnn(self, mocked_1nnn):
         operation = '1nnn'
-        parameters = (0x4AE)
+        parameters = [0x4AE]
         chip8 = self._init_chip8()
 
         chip8._execute_operation(operation, parameters)

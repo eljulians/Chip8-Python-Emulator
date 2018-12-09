@@ -9,7 +9,7 @@ def parse_znnn_opcode(opcode):
     operation = _construct_operation(opcode, 'nn', 'n')
     parameters = opcode_int & 0x0FFF
 
-    return operation, parameters
+    return operation, [parameters]
 
 
 def parse_zxkk_opcode(opcode):
@@ -17,7 +17,7 @@ def parse_zxkk_opcode(opcode):
     first_parameter = _get_byte_last_nibble_int(opcode[0])
     second_parameter = opcode[1]
 
-    return operation, (first_parameter, second_parameter)
+    return operation, [first_parameter, second_parameter]
 
 
 def parse_zxyz_opcode(opcode):
@@ -25,7 +25,7 @@ def parse_zxyz_opcode(opcode):
     first_parameter = _get_byte_last_nibble_int(opcode[0])
     second_parameter = _get_byte_first_nibble_int(opcode[1])
 
-    return operation, (first_parameter, second_parameter)
+    return operation, [first_parameter, second_parameter]
 
 
 def parse_zxyn_opcode(opcode):
@@ -34,7 +34,7 @@ def parse_zxyn_opcode(opcode):
     second_parameter = _get_byte_first_nibble_int(opcode[1])
     third_parameter = _get_byte_last_nibble_int(opcode[1])
 
-    return operation, (first_parameter, second_parameter, third_parameter)
+    return operation, [first_parameter, second_parameter, third_parameter]
 
 
 def parse_zxzz_opcode(opcode):
@@ -45,7 +45,7 @@ def parse_zxzz_opcode(opcode):
 
     parameter = _get_byte_last_nibble_int(opcode[0])
 
-    return operation, parameter
+    return operation, [parameter]
 
 
 OPCODE_PARSER_FUNCTIONS_PER_PREFIX = {
