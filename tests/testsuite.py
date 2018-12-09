@@ -3,6 +3,7 @@ import unittest
 
 from .chip8_test import Chip8Test
 from .opcode_parser_test import OpcodeParserTest
+from .screen_test import ScreenTest
 
 
 def suite():
@@ -10,6 +11,7 @@ def suite():
 
     suite.addTest(unittest.makeSuite(Chip8Test))
     suite.addTest(unittest.makeSuite(OpcodeParserTest))
+    suite.addTest(unittest.makeSuite(ScreenTest))
 
     return suite
 
