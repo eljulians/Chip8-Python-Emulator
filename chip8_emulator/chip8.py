@@ -19,7 +19,7 @@ class Chip8:
     I_REGISTER_LENGTH_BYTES = 2
 
     def __init__(self):
-        self.memory = [None] * 0xE9F
+        self.memory = [0x00] * 0xE9F
         self.stack = []
         self.stack_pointer = 0
         self.program_counter = 0x200
