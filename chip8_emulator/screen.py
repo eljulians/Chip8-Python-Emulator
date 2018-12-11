@@ -49,10 +49,6 @@ class Screen(Thread):
         for row in self._frame_buffer:
             buffer_column_x_axis = 0
             for column in row:
-                if buffer_row_y_axis >= self._HEIGHT:
-                    buffer_row_y_axis = self._HEIGHT - buffer_row_y_axis
-                if buffer_column_x_axis >= self._WIDTH:
-                    buffer_column_x_axis = self._WIDTH - buffer_column_x_axis
                 if self._frame_buffer[buffer_row_y_axis][buffer_column_x_axis]:
                     self._draw_pixel(buffer_column_x_axis, buffer_row_y_axis)
                 buffer_column_x_axis += 1

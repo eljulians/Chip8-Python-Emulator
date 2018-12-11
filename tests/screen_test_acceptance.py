@@ -28,10 +28,7 @@ class ScreenTest(unittest.TestCase):
 
         return frame_buffer
 
-    def test_draw(self):
-        """
-        Draw "CHIP8" in screen (each sprite 8x6, space between chars 2 pixels)
-        """
+    def test_draw_chip8(self):
         sprites = [
             [0xFF, 0xC0, 0xC0, 0xC0, 0xC0, 0xFF],  # C
             [0xC3, 0xC3, 0xFF, 0xFF, 0xC3, 0xC3],  # H
@@ -49,3 +46,39 @@ class ScreenTest(unittest.TestCase):
             x += 10
 
         input()
+
+    def test_draw_horizontal_overflowing_line(self):
+        sprite = [0xFF] * 15
+        screen = self._init_screen()
+
+        screen.draw_sprite(sprite, 30, screen._HEIGHT - 5)
+
+        input()
+
+    def test_draw_vertical_overflowing_line(self):
+        sprites = [[0xFF] for _ in range(10)]
+        screen = self._init_screen()
+
+        x = screen._WIDTH - 10
+
+        for sprite in sprites:
+            screen.draw_sprite(sprite, x, 30)
+            x += 8
+
+        input()
+
+    def test_draw_diagonal_overflowing_line(self):
+        sprites = [
+            # [0x01], [0x02], [0x04], [0x08], [0x10], [0x20], [0x40], [0x80]
+            [0x80], [0x40], [0x20], [0x10], [0x08], [0x04], [0x02], [0x01],
+        ]
+        screen = self._init_screen()
+
+        y = screen._HEIGHT - 5
+
+        for sprite in sprites:
+            screen.draw_sprite(sprite, screen._WIDTH - 4, y)
+            y += 1
+
+        input()
+
