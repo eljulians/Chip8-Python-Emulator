@@ -29,7 +29,8 @@ class Chip8:
         self.sound_timer = None
 
     def _00e0(self):
-        pass
+        # TODO: implement
+        self._increment_program_counter(1)
 
     def _00ee(self):
         self.program_counter = self.stack.pop()
@@ -151,21 +152,30 @@ class Chip8:
         self.v_registers[vx_index] = random.getrandbits(8) & value
         self._increment_program_counter(1)
 
-    def _dxyn(self, vx_coord, vy_coord, sprite_height):
-        pass
+    def _dxyn(self, vx_index, vy_index, sprite_height):
+        x_coordinate = self.v_registers[vx_index]
+        y_coordinate = self.v_registers[vy_index]
+        sprite_address_start = self.i_register
+        sprite_address_end = sprite_address_start + sprite_height
+        sprite = self.memory[sprite_address_start:sprite_address_end]
+        self.screen.draw_sprite(sprite, x_coordinate, y_coordinate)
+        self._increment_program_counter(1)
 
     def _ex9e(self):
-        pass
+        # TODO: implement
+        self._increment_program_counter(1)
 
     def _exa1(self):
-        pass
+        # TODO: implement
+        self._increment_program_counter(1)
 
     def _fx07(self, vx_index):
         self.v_registers[vx_index] = self.delay_timer
         self._increment_program_counter(1)
 
     def _fx0a(self, vx_index):
-        pass
+        # TODO: implement
+        self._increment_program_counter(1)
 
     def _fx15(self, vx_index):
         self.delay_timer = self.v_registers[vx_index]
@@ -180,10 +190,11 @@ class Chip8:
         self._increment_program_counter(1)
 
     def _fx29(self, vx_index):
-        pass
+        # TODO: implement
+        self._increment_program_counter(1)
 
     def _fx33(self, vx_index):
-        vx_value = self.v_registers[vx_index]
+        vx_value = '{:03}'.format(self.v_registers[vx_index])
         vx_value_digits = [int(digit) for digit in str(vx_value)]
         addresses = self._get_addresses_from_i_register_to_offset(3)
 
@@ -238,15 +249,15 @@ class Chip8:
         """
         operation_name_in_class = '_' + operation
         operation_function = getattr(self, operation_name_in_class)
-        if operation_name_in_class.startswith('_00') \
-                or operation_name_in_class.startswith('_e') \
-                or operation_name_in_class.startswith('_f'):
+        if operation_name_in_class.startswith('_00'):
             operation_function()
         elif operation_name_in_class.startswith('_0') \
                 or operation_name_in_class.startswith('_1') \
                 or operation_name_in_class.startswith('_2') \
                 or operation_name_in_class.startswith('_a') \
-                or operation_name_in_class.startswith('_b'):
+                or operation_name_in_class.startswith('_b') \
+                or operation_name_in_class.startswith('_e') \
+                or operation_name_in_class.startswith('_f'):
             operation_function(parameters[0])
         elif operation_name_in_class.startswith('_3') \
                 or operation_name_in_class.startswith('_4') \
@@ -260,7 +271,26 @@ class Chip8:
         elif operation_name_in_class.startswith('_d'):
             operation_function(parameters[0], parameters[1], parameters[2])
 
+    def _debug(self, opcode):
+        print('>>> after {0}'.format(hex(int.from_bytes(opcode, 'big'))[2:]))
+        print('> Program counter: ' + hex(self.program_counter))
+        v_registers = []
+        for v in self.v_registers:
+            try:
+                v_registers.append(hex(v))
+            except TypeError:
+                v_registers.append('0x00')
+        print('> V registers: ' + ','.join(v for v in v_registers))
+
+        try:
+            i_register = hex(self.i_register)
+        except TypeError:
+            i_register = 'None'
+        print('> I register: ' + i_register)
+
     def main(self):
-        opcode = self._get_current_opcode()
-        operation, parameters = parse_operation_and_parameters(opcode)
-        self._execute_operation(operation, parameters)
+        while True:
+            opcode = self._get_current_opcode()
+            operation, parameters = parse_operation_and_parameters(opcode)
+            self._execute_operation(operation, parameters)
+            self._debug(opcode)
