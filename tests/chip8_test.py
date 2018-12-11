@@ -6,7 +6,8 @@ from chip8_emulator.chip8 import Chip8
 class Chip8Test(unittest.TestCase):
 
     def _init_chip8(self, program_counter=0x200, stack_pointer=0xEA0, stack=[],
-                    v_registers=[], i_register=None, memory=[None] * 4096):
+                    v_registers=[None] * 16, i_register=None,
+                    memory=[None] * 4096, delay_timer=None, sound_timer=None):
         chip8 = Chip8()
         chip8.program_counter = program_counter
         chip8.stack_pointer = stack_pointer
@@ -14,11 +15,13 @@ class Chip8Test(unittest.TestCase):
         chip8.v_registers = v_registers
         chip8.i_register = i_register
         chip8.memory = memory
+        chip8.delay_timer = delay_timer
+        chip8.sound_timer = sound_timer
 
         return chip8
 
     def test_00e0(self):
-        self.fail('Not yet tested')
+        self.fail('Not yet implemented')
 
     def test_00ee(self):
         program_counter = 0x317
@@ -486,29 +489,71 @@ class Chip8Test(unittest.TestCase):
 
         self.assertEqual(expected_program_counter, actual_program_counter)
 
-    def test_cxkk(self):
-        self.fail('Not yet tested')
+    @mock.patch('random.getrandbits')
+    def test_cxkk(self, mocked_getrandbits):
+        v_registers = [None] * 16
+        vx_index = 0x4
+        mocked_getrandbits.return_value = 0xAE
+        input_value = 0x45
+        chip8 = self._init_chip8(v_registers=v_registers)
+
+        chip8._cxkk(vx_index, input_value)
+
+        expected_vx_value = 0x04
+        actual_vx_value = chip8.v_registers[vx_index]
+
+        self.assertEqual(expected_vx_value, actual_vx_value)
 
     def test_dxyn(self):
-        self.fail('Not yet tested')
+        self.fail('Not yet implemented')
 
     def test_ex9e(self):
-        self.fail('Not yet tested')
+        self.fail('Not yet implemented')
 
     def test_exa1(self):
-        self.fail('Not yet tested')
+        self.fail('Not yet implemented')
 
     def test_fx07(self):
-        self.fail('Not yet tested')
+        delay_timer = 0x05
+        vx_index = 0x7
+        chip8 = self._init_chip8(delay_timer=delay_timer)
+
+        chip8._fx07(vx_index)
+
+
+        expected_vx_value = 0x05
+        actual_vx_value = chip8.v_registers[vx_index]
+
+        self.assertEqual(expected_vx_value, actual_vx_value)
 
     def test_fx0a(self):
-        self.fail('Not yet tested')
+        self.fail('Not yet implemented')
 
     def test_fx15(self):
-        self.fail('Not yet tested')
+        v_registers = [None] * 16
+        vx_index = 0x7
+        v_registers[vx_index] = 0xAE
+        chip8 = self._init_chip8(v_registers=v_registers)
+
+        chip8._fx15(vx_index)
+
+        expected_delay_timer = 0xAE
+        actual_delay_timer = chip8.delay_timer
+
+        self.assertEqual(expected_delay_timer, actual_delay_timer)
 
     def test_fx18(self):
-        self.fail('Not yet tested')
+        v_registers = [None] * 16
+        vx_index = 0x3
+        v_registers[vx_index] = 0x45
+        chip8 = self._init_chip8(v_registers=v_registers)
+
+        chip8._fx18(vx_index)
+
+        expected_sound_timer = 0x45
+        actual_sound_timer = chip8.sound_timer
+
+        self.assertEqual(expected_sound_timer, actual_sound_timer)
 
     def test_fx1e(self):
         v_registers = [None] * 16
@@ -526,7 +571,7 @@ class Chip8Test(unittest.TestCase):
         self.assertEqual(expected_i_register, actual_i_register)
 
     def test_fx29(self):
-        self.fail('Not yet tested')
+        self.fail('Not yet implemented')
 
     def test_fx33(self):
         v_registers = [None] * 16

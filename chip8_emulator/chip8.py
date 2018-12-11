@@ -1,3 +1,4 @@
+import random
 from .opcode_parser import parse_operation_and_parameters
 
 
@@ -24,6 +25,8 @@ class Chip8:
         self.program_counter = 0x200
         self.v_registers = [None] * self.V_REGISTERS_LENGTH_BYTES
         self.i_register = None
+        self.delay_timer = None
+        self.sound_timer = None
 
     def _00e0(self):
         pass
@@ -144,8 +147,9 @@ class Chip8:
     def _bnnn(self, address):
         self.program_counter = address + self.v_registers[0x0]
 
-    def _cxkk(self, value):
-        pass
+    def _cxkk(self, vx_index, value):
+        self.v_registers[vx_index] = random.getrandbits(8) & value
+        self._increment_program_counter(1)
 
     def _dxyn(self, vx_coord, vy_coord, sprite_height):
         pass
@@ -157,16 +161,19 @@ class Chip8:
         pass
 
     def _fx07(self, vx_index):
-        pass
+        self.v_registers[vx_index] = self.delay_timer
+        self._increment_program_counter(1)
 
     def _fx0a(self, vx_index):
         pass
 
     def _fx15(self, vx_index):
-        pass
+        self.delay_timer = self.v_registers[vx_index]
+        self._increment_program_counter(1)
 
     def _fx18(self, vx_index):
-        pass
+        self.sound_timer = self.v_registers[vx_index]
+        self._increment_program_counter(1)
 
     def _fx1e(self, vx_index):
         self.i_register += self.v_registers[vx_index]
@@ -183,6 +190,8 @@ class Chip8:
         for address in addresses:
             self.memory[address] = vx_value_digits.pop(0)
 
+        self._increment_program_counter(1)
+
     def _fx55(self, vx_index):
         addresses = self._get_addresses_from_i_register_to_offset(vx_index)
         v_register_values = self.v_registers[:vx_index]
@@ -190,12 +199,16 @@ class Chip8:
         for address in addresses:
             self.memory[address] = v_register_values.pop(0)
 
+        self._increment_program_counter(1)
+
     def _fx65(self, vx_index):
         addresses = self._get_addresses_from_i_register_to_offset(vx_index)
 
         for v_index in range(0, vx_index):
             address = addresses.pop(0)
             self.v_registers[v_index] = self.memory[address]
+
+        self._increment_program_counter(1)
 
     # No opcode methods #
 
