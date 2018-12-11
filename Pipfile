@@ -12,6 +12,7 @@ cov-stdout = "coverage report"
 coverage = "*"
 
 [packages]
+pygame = "*"
 
 [requires]
 python_version = "3.7"
