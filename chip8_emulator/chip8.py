@@ -175,10 +175,7 @@ class Chip8:
     def _fx29(self, vx_index):
         pass
 
-    def _get_addresses_from_i_register_to_offset(self, offset):
-        return [self.i_register + index for index in range(0, offset)]
-
-    def store_binary_coded_decimal_of_vx_in_i_register(self, vx_index):
+    def _fx33(self, vx_index):
         vx_value = self.v_registers[vx_index]
         vx_value_digits = [int(digit) for digit in str(vx_value)]
         addresses = self._get_addresses_from_i_register_to_offset(3)
@@ -186,19 +183,24 @@ class Chip8:
         for address in addresses:
             self.memory[address] = vx_value_digits.pop(0)
 
-    def store_from_v0_to_vx_in_i_register(self, vx_index):
+    def _fx55(self, vx_index):
         addresses = self._get_addresses_from_i_register_to_offset(vx_index)
         v_register_values = self.v_registers[:vx_index]
 
         for address in addresses:
             self.memory[address] = v_register_values.pop(0)
 
-    def read_v0_to_vx_from_i_register(self, vx_index):
+    def _fx65(self, vx_index):
         addresses = self._get_addresses_from_i_register_to_offset(vx_index)
 
         for v_index in range(0, vx_index):
             address = addresses.pop(0)
             self.v_registers[v_index] = self.memory[address]
+
+    # No opcode methods #
+
+    def _get_addresses_from_i_register_to_offset(self, offset):
+        return [self.i_register + index for index in range(0, offset)]
 
     def _load_rom_to_memory(self, rom_path):
         memory_index = 0x200

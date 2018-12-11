@@ -528,7 +528,7 @@ class Chip8Test(unittest.TestCase):
     def test_fx29(self):
         self.fail('Not yet tested')
 
-    def test_store_binary_coded_decimal_of_vx_in_i_register(self):
+    def test_fx33(self):
         v_registers = [None] * 16
         memory = [None] * 4096
         vx_index = 0x5
@@ -537,7 +537,7 @@ class Chip8Test(unittest.TestCase):
         chip8 = self._init_chip8(v_registers=v_registers,
                                  i_register=i_register, memory=memory)
 
-        chip8.store_binary_coded_decimal_of_vx_in_i_register(vx_index)
+        chip8._fx33(vx_index)
 
         expected_i0_memory_location_value = 1
         actual_i0_memory_location_value = chip8.memory[0xCE5]
@@ -553,7 +553,7 @@ class Chip8Test(unittest.TestCase):
         self.assertEqual(expected_i2_memory_location_value,
                          actual_i2_memory_location_value)
 
-    def test_store_from_v0_to_vx_in_i_register(self):
+    def test_fx55(self):
         v_registers = [0x14, 0xF4, 0x61, 0xDE]
         memory = [None] * 4096
         vx_index = 0x4
@@ -561,7 +561,7 @@ class Chip8Test(unittest.TestCase):
         chip8 = self._init_chip8(v_registers=v_registers,
                                  i_register=i_register, memory=memory)
 
-        chip8.store_from_v0_to_vx_in_i_register(vx_index)
+        chip8._fx55(vx_index)
 
         expected_i0_memory_location_value = 0x14
         actual_i0_memory_location_value = chip8.memory[0x7A4]
@@ -581,7 +581,7 @@ class Chip8Test(unittest.TestCase):
         self.assertEqual(expected_i3_memory_location_value,
                          actual_i3_memory_location_value)
 
-    def test_read_v0_to_vx_from_i_register(self):
+    def test_fx65(self):
         v_registers = [None] * 16
         vx_index = 0x4
         i_register = 0x5DA
@@ -593,7 +593,7 @@ class Chip8Test(unittest.TestCase):
         chip8 = self._init_chip8(v_registers=v_registers,
                                  i_register=i_register, memory=memory)
 
-        chip8.read_v0_to_vx_from_i_register(vx_index)
+        chip8._fx65(vx_index)
 
         expected_v0_value = 0x48
         actual_v0_value = chip8.v_registers[0x0]
