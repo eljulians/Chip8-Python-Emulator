@@ -12,6 +12,9 @@ class Screen(Thread):
     def __init__(self):
         Thread.__init__(self)
         self._init_frame_buffer_to_0()
+        self.screen = None
+
+    def init_screen(self):
         self.screen = pygame.display.set_mode((self._WIDTH, self._HEIGHT))
 
     def _clear_screen(self):

@@ -266,6 +266,7 @@ class Chip8:
         print('> I register: ' + i_register)
 
     def main(self):
+        self.screen.init_screen()
         while True:
             opcode = self._get_current_opcode()
             operation, parameters = parse_operation_and_parameters(opcode)
