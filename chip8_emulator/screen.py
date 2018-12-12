@@ -4,8 +4,9 @@ import pygame
 
 class Screen(Thread):
 
-    _WIDTH = 128
-    _HEIGHT = 64
+    _SCALATION_FACTOR = 1
+    _WIDTH = 64 * _SCALATION_FACTOR
+    _HEIGHT = 32 * _SCALATION_FACTOR
     _SCREEN_COLOR_RGB = (0, 0, 0)
     _PIXEL_COLOR_RGB = (255, 255, 255)
 
@@ -60,10 +61,26 @@ class Screen(Thread):
         pygame.display.flip()
 
     def draw_sprite(self, sprite, buffer_column_x_axis, buffer_row_y_axis):
-        self._clear_screen()
+        # self._clear_screen()
         self._update_frame_buffer(sprite, buffer_row_y_axis,
                                   buffer_column_x_axis)
         self._refresh()
+
+    def _scale_sprite(self, sprite):
+        scaled_sprite = []
+
+        for sprite_row in sprite:
+            scaled_sprite_row_bit_string = ''
+            original_sprite_bit_string = '{:08b}'.format(sprite_row)
+            for sprite_bit in original_sprite_bit_string:
+                for _ in range(self._SCALATION_FACTOR):
+                    scaled_sprite_row_bit_string += sprite_bit
+
+            scaled_sprite_row_int = int(scaled_sprite_row_bit_string, 2)
+            for _ in range(self._SCALATION_FACTOR):
+                scaled_sprite.append(scaled_sprite_row_int)
+
+        return scaled_sprite
 
     def run(self):
         print('Thread started')

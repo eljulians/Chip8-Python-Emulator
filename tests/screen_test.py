@@ -4,9 +4,11 @@ from chip8_emulator.screen import Screen
 
 class ScreenTest(unittest.TestCase):
 
-    def _init_screen(self, frame_buffer):
+    def _init_screen(self, frame_buffer=None):
         screen = Screen()
-        screen._frame_buffer = frame_buffer
+
+        if frame_buffer is not None:
+            screen._frame_buffer = frame_buffer
 
         return screen
 
@@ -45,3 +47,37 @@ class ScreenTest(unittest.TestCase):
         actual_frame_buffer = screen._frame_buffer
 
         self.assertEqual(expected_frame_buffer, actual_frame_buffer)
+
+    def test_scale_sprite_x2(self):
+        screen = self._init_screen()
+        screen._SCALATION_FACTOR = 2
+        original_sprite = [0xFF, 0xC0, 0xC0, 0xC0, 0xC0, 0xFF]  # C
+
+        expected_sprite = [
+            0xFFFF, 0xFFFF,
+            0xF000, 0xF000,
+            0xF000, 0xF000,
+            0xF000, 0xF000,
+            0xF000, 0xF000,
+            0xFFFF, 0xFFFF,
+        ]
+        actual_sprite = screen._scale_sprite(original_sprite)
+
+        self.assertEqual(expected_sprite, actual_sprite)
+
+    def test_scale_sprite_x3(self):
+        screen = self._init_screen()
+        screen._SCALATION_FACTOR = 3
+        original_sprite = [0xFF, 0xC0, 0xC0, 0xC0, 0xC0, 0xFF]  # C
+
+        expected_sprite = [
+            0xFFFFFF, 0xFFFFFF, 0xFFFFFF,
+            0xFC0000, 0xFC0000, 0xFC0000,
+            0xFC0000, 0xFC0000, 0xFC0000,
+            0xFC0000, 0xFC0000, 0xFC0000,
+            0xFC0000, 0xFC0000, 0xFC0000,
+            0xFFFFFF, 0xFFFFFF, 0xFFFFFF,
+        ]
+        actual_sprite = screen._scale_sprite(original_sprite)
+
+        self.assertEqual(expected_sprite, actual_sprite)

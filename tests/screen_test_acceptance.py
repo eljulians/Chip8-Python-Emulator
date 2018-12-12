@@ -40,6 +40,7 @@ class ScreenTest(unittest.TestCase):
         y = 5
 
         screen = self._init_screen()
+        screen.init_screen()
 
         for sprite in sprites:
             screen.draw_sprite(sprite, x, y)
@@ -50,6 +51,7 @@ class ScreenTest(unittest.TestCase):
     def test_draw_horizontal_overflowing_line(self):
         sprite = [0xFF] * 15
         screen = self._init_screen()
+        screen.init_screen()
 
         screen.draw_sprite(sprite, 30, screen._HEIGHT - 5)
 
@@ -58,6 +60,7 @@ class ScreenTest(unittest.TestCase):
     def test_draw_vertical_overflowing_line(self):
         sprites = [[0xFF] for _ in range(10)]
         screen = self._init_screen()
+        screen.init_screen()
 
         x = screen._WIDTH - 10
 
@@ -73,6 +76,7 @@ class ScreenTest(unittest.TestCase):
             [0x80], [0x40], [0x20], [0x10], [0x08], [0x04], [0x02], [0x01],
         ]
         screen = self._init_screen()
+        screen.init_screen()
 
         y = screen._HEIGHT - 5
 
