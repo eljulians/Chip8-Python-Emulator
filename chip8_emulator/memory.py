@@ -33,3 +33,12 @@ class Memory:
 
     def decrement_program_counter(self):
         self.program_counter -= 2
+
+    def get_current_opcode(self):
+        opcode_first_byte = self.program_memory[self.program_counter]
+        opcode_last_byte = self.program_memory[self.program_counter + 1]
+
+        return bytes([opcode_first_byte, opcode_last_byte])
+
+    def get_addresses_from_i_register_to_offset(self, offset):
+        return [self.i_register + index for index in range(0, offset)]

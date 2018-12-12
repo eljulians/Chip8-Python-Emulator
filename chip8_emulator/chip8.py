@@ -176,7 +176,7 @@ class Chip8:
     def _fx33(self, vx_index):
         vx_value = '{:03}'.format(self.memory.v_registers[vx_index])
         vx_value_digits = [int(digit) for digit in str(vx_value)]
-        addresses = self._get_addresses_from_i_register_to_offset(3)
+        addresses = self.memory.get_addresses_from_i_register_to_offset(3)
 
         for address in addresses:
             self.memory.program_memory[address] = vx_value_digits.pop(0)
@@ -184,7 +184,7 @@ class Chip8:
         self.memory.increment_program_counter()
 
     def _fx55(self, vx_index):
-        addresses = self._get_addresses_from_i_register_to_offset(vx_index)
+        addresses = self.memory.get_addresses_from_i_register_to_offset(vx_index)
         v_register_values = self.memory.v_registers[:vx_index]
 
         for address in addresses:
@@ -193,7 +193,7 @@ class Chip8:
         self.memory.increment_program_counter()
 
     def _fx65(self, vx_index):
-        addresses = self._get_addresses_from_i_register_to_offset(vx_index)
+        addresses = self.memory.get_addresses_from_i_register_to_offset(vx_index)
 
         for v_index in range(0, vx_index):
             address = addresses.pop(0)
@@ -203,9 +203,6 @@ class Chip8:
 
     # No opcode methods #
 
-    def _get_addresses_from_i_register_to_offset(self, offset):
-        return [self.memory.i_register + index for index in range(0, offset)]
-
     def _load_rom_to_memory(self, rom_path):
         memory_index = 0x200
 
@@ -213,12 +210,6 @@ class Chip8:
             for rom_byte in rom_handle.read():
                 self.memory.program_memory[memory_index] = rom_byte
                 memory_index += 1
-
-    def _get_current_opcode(self):
-        opcode_first_byte = self.memory.program_memory[self.memory.program_counter]
-        opcode_last_byte = self.memory.program_memory[self.memory.program_counter + 1]
-
-        return bytes([opcode_first_byte, opcode_last_byte])
 
     def _execute_operation(self, operation, parameters):
         """
@@ -266,9 +257,10 @@ class Chip8:
         print('> I register: ' + i_register)
 
     def main(self):
+        self._load_rom_to_memory('roms/pong.rom')
         self.screen.init_screen()
         while True:
-            opcode = self._get_current_opcode()
+            opcode = self.memory.get_current_opcode()
             operation, parameters = parse_operation_and_parameters(opcode)
             self._execute_operation(operation, parameters)
             self._debug(opcode)

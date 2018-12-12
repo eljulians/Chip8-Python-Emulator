@@ -4,7 +4,6 @@ from chip8_emulator.chip8 import Chip8
 from chip8_emulator.memory import Memory
 
 
-
 class Chip8Test(unittest.TestCase):
 
     def _init_chip8(self, program_counter=0x200, stack_pointer=0xEA0, stack=[],
@@ -519,7 +518,6 @@ class Chip8Test(unittest.TestCase):
 
         chip8._fx07(vx_index)
 
-
         expected_vx_value = 0x05
         actual_vx_value = chip8.memory.v_registers[vx_index]
 
@@ -691,24 +689,6 @@ class Chip8Test(unittest.TestCase):
         actual_program_memory = chip8.memory.program_memory
 
         self.assertEqual(expected_program_memory, actual_program_memory)
-
-    def test_get_current_opcode(self):
-        memory = [None] * 4096
-        program_counter = 0x30F
-        loaded_memory_from_0x300 = [
-            0x6A, 0x2, 0x6B, 0xC, 0x6C, 0x3F, 0x6D, 0xC, 0xA2, 0xEA,
-            0xDA, 0xB6, 0xDC, 0xD6, 0x6E, 0xAE, 0x22, 0xD4, 0x66, 0x3,
-            0x68, 0x2, 0x60, 0x60, 0xF0, 0x15, 0xF0, 0x7, 0x30, 0x0,
-            0x12, 0x1A, 0xC7, 0x17, 0x77, 0x8, 0x69, 0xFF, 0xA2, 0xF0,
-        ]
-        memory[0x300:0x300] = loaded_memory_from_0x300
-        chip8 = self._init_chip8(program_counter=program_counter,
-                                 program_memory=memory)
-
-        expected_opcode = bytes([0xAE, 0x22])
-        actual_opcode = chip8._get_current_opcode()
-
-        self.assertEqual(expected_opcode, actual_opcode)
 
     @mock.patch('chip8_emulator.chip8.Chip8._1nnn')
     def test_execute_operation__1nnn(self, mocked_1nnn):
