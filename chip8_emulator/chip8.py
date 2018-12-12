@@ -217,7 +217,9 @@ class Chip8:
                 or operation_name_in_class.startswith('_a') \
                 or operation_name_in_class.startswith('_b') \
                 or operation_name_in_class.startswith('_e') \
-                or operation_name_in_class.startswith('_f'):
+                or operation_name_in_class.startswith('_f') \
+                or operation_name_in_class.startswith('_8xy6') \
+                or operation_name_in_class.startswith('_8xye'):
             operation_function(parameters[0])
         elif operation_name_in_class.startswith('_3') \
                 or operation_name_in_class.startswith('_4') \
