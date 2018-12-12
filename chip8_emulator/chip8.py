@@ -248,8 +248,8 @@ class Chip8:
             i_register = 'None'
         print('> I register: ' + i_register)
 
-    def main(self):
-        with open('roms/pong.rom', 'rb') as rom_handle:
+    def main(self, rom_name):
+        with open('roms/{0}.rom'.format(rom_name), 'rb') as rom_handle:
             self.memory.load_rom(rom_handle)
         self.screen.init_screen()
         while True:
