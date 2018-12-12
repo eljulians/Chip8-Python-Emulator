@@ -39,7 +39,9 @@ class Screen(Thread):
     def _update_frame_buffer(self, sprite, buffer_row_y_axis,
                              buffer_column_x_axis):
         for pixel_int_row in sprite:
-            bit_row_string = '{:08b}'.format(pixel_int_row)
+            row_size_bits = 8 * self._SCALATION_FACTOR
+            bit_row_formatter = '{:0' + str(row_size_bits) + 'b}'
+            bit_row_string = bit_row_formatter.format(pixel_int_row)
             self._set_bit_row_to_frame_buffer(bit_row_string,
                                               buffer_row_y_axis,
                                               buffer_column_x_axis)
@@ -62,7 +64,10 @@ class Screen(Thread):
 
     def draw_sprite(self, sprite, buffer_column_x_axis, buffer_row_y_axis):
         # self._clear_screen()
-        self._update_frame_buffer(sprite, buffer_row_y_axis,
+        scalated_sprite = self._scale_sprite(sprite)
+        buffer_column_x_axis *= self._SCALATION_FACTOR
+        buffer_row_y_axis *= self._SCALATION_FACTOR
+        self._update_frame_buffer(scalated_sprite, buffer_row_y_axis,
                                   buffer_column_x_axis)
         self._refresh()
 
