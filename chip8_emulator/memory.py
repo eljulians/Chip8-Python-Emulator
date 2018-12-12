@@ -31,9 +31,6 @@ class Memory:
     def increment_program_counter(self):
         self.program_counter += 2
 
-    def decrement_program_counter(self):
-        self.program_counter -= 2
-
     def get_current_opcode(self):
         opcode_first_byte = self.program_memory[self.program_counter]
         opcode_last_byte = self.program_memory[self.program_counter + 1]
@@ -42,3 +39,10 @@ class Memory:
 
     def get_addresses_from_i_register_to_offset(self, offset):
         return [self.i_register + index for index in range(0, offset)]
+
+    def load_rom(self, rom_handle):
+        memory_index = 0x200
+
+        for rom_byte in rom_handle.read():
+            self.program_memory[memory_index] = rom_byte
+            memory_index += 1

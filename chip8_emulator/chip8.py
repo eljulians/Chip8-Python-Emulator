@@ -203,14 +203,6 @@ class Chip8:
 
     # No opcode methods #
 
-    def _load_rom_to_memory(self, rom_path):
-        memory_index = 0x200
-
-        with open(rom_path, 'rb') as rom_handle:
-            for rom_byte in rom_handle.read():
-                self.memory.program_memory[memory_index] = rom_byte
-                memory_index += 1
-
     def _execute_operation(self, operation, parameters):
         """
         TODO: refactor operation calling
@@ -257,7 +249,8 @@ class Chip8:
         print('> I register: ' + i_register)
 
     def main(self):
-        self._load_rom_to_memory('roms/pong.rom')
+        with open('roms/pong.rom', 'rb') as rom_handle:
+            self.memory.load_rom(rom_handle)
         self.screen.init_screen()
         while True:
             opcode = self.memory.get_current_opcode()
