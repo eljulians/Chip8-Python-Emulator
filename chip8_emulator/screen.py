@@ -4,7 +4,8 @@ import pygame
 
 class Screen(Thread):
 
-    _SCALATION_FACTOR = 1
+    _SPRITE_WIDTH_BITS = 8
+    _SCALATION_FACTOR = 8
     _WIDTH = 64 * _SCALATION_FACTOR
     _HEIGHT = 32 * _SCALATION_FACTOR
     _SCREEN_COLOR_RGB = (0, 0, 0)
@@ -29,18 +30,18 @@ class Screen(Thread):
         pygame.draw.line(self.screen, self._PIXEL_COLOR_RGB, (x, y), (x, y))
 
     def _refresh_segment(self, segment, initial_x, initial_y):
-        segment_row_y_axis = 0
+        segment_row_index = 0
         current_y = initial_y
 
         for segment_row in segment:
             current_x = initial_x
-            segment_column_x_axis = 0
-            for segment_column in segment_row:
-                if segment[segment_row_y_axis][segment_column_x_axis]:
+            segment_column_index = 0
+            for _ in segment_row:
+                if segment[segment_row_index][segment_column_index]:
                     self._draw_pixel(current_x, current_y)
                 current_x += 1
-                segment_column_x_axis += 1
-            segment_row_y_axis += 1
+                segment_column_index += 1
+            segment_row_index += 1
             current_y += 1
 
         pygame.display.flip()
@@ -58,61 +59,72 @@ class Screen(Thread):
 
         return segment
 
-    def _set_bit_row_to_screen_buffer(self, bit_row_string, buffer_row_y_axis,
-                                     buffer_column_x_axis):
-        for bit_column_string in bit_row_string:
-            bit_column_int = int(bit_column_string)
-            if buffer_row_y_axis >= self._HEIGHT:
-                buffer_row_y_axis = buffer_row_y_axis - self._HEIGHT
-            if buffer_column_x_axis >= self._WIDTH:
-                buffer_column_x_axis = buffer_column_x_axis - self._WIDTH
-            self._screen_buffer[buffer_row_y_axis][buffer_column_x_axis] ^= bit_column_int
-            buffer_column_x_axis += 1
+    def _wrap_row_if_overflow(self, row):
+        if row >= self._HEIGHT:
+            row = row - self._HEIGHT
 
-    def _update_screen_buffer(self, sprite, buffer_row_y_axis,
-                             buffer_column_x_axis):
-        for pixel_int_row in sprite:
-            row_size_bits = 8 * self._SCALATION_FACTOR
-            bit_row_formatter = '{:0' + str(row_size_bits) + 'b}'
-            bit_row_string = bit_row_formatter.format(pixel_int_row)
-            self._set_bit_row_to_screen_buffer(bit_row_string,
-                                              buffer_row_y_axis,
-                                              buffer_column_x_axis)
-            buffer_row_y_axis += 1
+        return row
+
+    def _wrap_column_if_overflow(self, column):
+        if column >= self._WIDTH:
+            column = column - self._WIDTH
+
+        return column
+
+    def _set_bit_row_to_screen_buffer(self, sprite_row_bitstring, buffer_row,
+                                      buffer_column):
+        for sprite_column_bitchar in sprite_row_bitstring:
+            sprite_column_bit_int = int(sprite_column_bitchar)
+            buffer_row = self._wrap_row_if_overflow(buffer_row)
+            buffer_column = self._wrap_column_if_overflow(buffer_column)
+            self._screen_buffer[buffer_row][buffer_column] ^= sprite_column_bit_int
+            buffer_column += 1
+
+    def _update_screen_buffer(self, sprite, buffer_row, buffer_column):
+        for sprite_row_int in sprite:
+            row_length_bits = self._SPRITE_WIDTH_BITS * self._SCALATION_FACTOR
+            bit_row_formatter = '{:0' + str(row_length_bits) + 'b}'
+            sprite_row_bitstring = bit_row_formatter.format(sprite_row_int)
+            self._set_bit_row_to_screen_buffer(sprite_row_bitstring,
+                                               buffer_row, buffer_column)
+            buffer_row += 1
+
+    def _scale_sprite_row(self, sprite_row):
+        scaled_sprite_row_bitstring = ''
+        original_sprite_row_bitstring = '{:08b}'.format(sprite_row)
+
+        for sprite_bit in original_sprite_row_bitstring:
+            for _ in range(self._SCALATION_FACTOR):
+                scaled_sprite_row_bitstring += sprite_bit
+
+        return scaled_sprite_row_bitstring
 
     def _scale_sprite(self, sprite):
         scaled_sprite = []
 
         for sprite_row in sprite:
-            scaled_sprite_row_bit_string = ''
-            original_sprite_bit_string = '{:08b}'.format(sprite_row)
-            for sprite_bit in original_sprite_bit_string:
-                for _ in range(self._SCALATION_FACTOR):
-                    scaled_sprite_row_bit_string += sprite_bit
+            scaled_sprite_row_bitstring = self._scale_sprite_row(sprite_row)
+            scaled_sprite_row_int = int(scaled_sprite_row_bitstring, 2)
 
-            scaled_sprite_row_int = int(scaled_sprite_row_bit_string, 2)
             for _ in range(self._SCALATION_FACTOR):
                 scaled_sprite.append(scaled_sprite_row_int)
 
         return scaled_sprite
 
-    def draw_sprite(self, sprite, buffer_column_x_axis, buffer_row_y_axis):
-        scalated_sprite = self._scale_sprite(sprite)
-        buffer_column_x_axis *= self._SCALATION_FACTOR
-        buffer_row_y_axis *= self._SCALATION_FACTOR
-        self._update_screen_buffer(scalated_sprite, buffer_row_y_axis,
-                                   buffer_column_x_axis)
+    def draw_sprite(self, sprite, buffer_column, buffer_row):
+        scaled_sprite = self._scale_sprite(sprite)
+        buffer_column *= self._SCALATION_FACTOR
+        buffer_row *= self._SCALATION_FACTOR
+        self._update_screen_buffer(scaled_sprite, buffer_row, buffer_column)
 
         sprite_width = 8 * self._SCALATION_FACTOR
-        sprite_height = len(scalated_sprite)
+        sprite_height = len(scaled_sprite)
 
         segment_to_draw = self._get_segment_bit_matrix_to_draw(
-            buffer_row_y_axis, buffer_column_x_axis, sprite_width,
-            sprite_height
+            buffer_row, buffer_column, sprite_width, sprite_height
         )
 
-        self._refresh_segment(segment_to_draw, buffer_column_x_axis,
-                              buffer_row_y_axis)
+        self._refresh_segment(segment_to_draw, buffer_column, buffer_row)
 
     def run(self):
         print('Thread started')
