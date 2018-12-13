@@ -12,7 +12,7 @@ class Screen(Thread):
 
     def __init__(self):
         Thread.__init__(self)
-        self._init_frame_buffer_to_0()
+        self._init_screen_buffer_to_0()
         self.screen = None
 
     def init_screen(self):
@@ -22,8 +22,8 @@ class Screen(Thread):
         self.screen.fill(self._SCREEN_COLOR_RGB)
         pygame.display.flip()
 
-    def _init_frame_buffer_to_0(self):
-        self._frame_buffer = [[0] * self._WIDTH for i in range(self._HEIGHT)]
+    def _init_screen_buffer_to_0(self):
+        self._screen_buffer = [[0] * self._WIDTH for i in range(self._HEIGHT)]
 
     def _draw_pixel(self, x, y):
         pygame.draw.line(self.screen, self._PIXEL_COLOR_RGB, (x, y), (x, y))
@@ -48,17 +48,17 @@ class Screen(Thread):
     def _get_segment_bit_matrix_to_draw(self, row_index_begin,
                                         column_index_begin, sprite_width,
                                         sprite_height):
-        sprite = []
+        segment = []
 
         row_index_end = row_index_begin + sprite_height
         column_index_end = column_index_begin + sprite_width
 
-        for buffer_row in self._frame_buffer[row_index_begin:row_index_end]:
-            sprite.append(buffer_row[column_index_begin:column_index_end])
+        for buffer_row in self._screen_buffer[row_index_begin:row_index_end]:
+            segment.append(buffer_row[column_index_begin:column_index_end])
 
-        return sprite
+        return segment
 
-    def _set_bit_row_to_frame_buffer(self, bit_row_string, buffer_row_y_axis,
+    def _set_bit_row_to_screen_buffer(self, bit_row_string, buffer_row_y_axis,
                                      buffer_column_x_axis):
         for bit_column_string in bit_row_string:
             bit_column_int = int(bit_column_string)
@@ -66,16 +66,16 @@ class Screen(Thread):
                 buffer_row_y_axis = buffer_row_y_axis - self._HEIGHT
             if buffer_column_x_axis >= self._WIDTH:
                 buffer_column_x_axis = buffer_column_x_axis - self._WIDTH
-            self._frame_buffer[buffer_row_y_axis][buffer_column_x_axis] ^= bit_column_int
+            self._screen_buffer[buffer_row_y_axis][buffer_column_x_axis] ^= bit_column_int
             buffer_column_x_axis += 1
 
-    def _update_frame_buffer(self, sprite, buffer_row_y_axis,
+    def _update_screen_buffer(self, sprite, buffer_row_y_axis,
                              buffer_column_x_axis):
         for pixel_int_row in sprite:
             row_size_bits = 8 * self._SCALATION_FACTOR
             bit_row_formatter = '{:0' + str(row_size_bits) + 'b}'
             bit_row_string = bit_row_formatter.format(pixel_int_row)
-            self._set_bit_row_to_frame_buffer(bit_row_string,
+            self._set_bit_row_to_screen_buffer(bit_row_string,
                                               buffer_row_y_axis,
                                               buffer_column_x_axis)
             buffer_row_y_axis += 1
@@ -100,11 +100,12 @@ class Screen(Thread):
         scalated_sprite = self._scale_sprite(sprite)
         buffer_column_x_axis *= self._SCALATION_FACTOR
         buffer_row_y_axis *= self._SCALATION_FACTOR
-        self._update_frame_buffer(scalated_sprite, buffer_row_y_axis,
-                                  buffer_column_x_axis)
+        self._update_screen_buffer(scalated_sprite, buffer_row_y_axis,
+                                   buffer_column_x_axis)
 
         sprite_width = 8 * self._SCALATION_FACTOR
         sprite_height = len(scalated_sprite)
+
         segment_to_draw = self._get_segment_bit_matrix_to_draw(
             buffer_row_y_axis, buffer_column_x_axis, sprite_width,
             sprite_height
