@@ -6,12 +6,13 @@ from .memory import Memory
 
 class Chip8:
 
-    def __init__(self, screen):
+    def __init__(self, screen, keyboard):
         self.memory = Memory()
         self.screen_proxy = ScreenProxy(screen)
+        self.keyboard = keyboard
 
     def _00e0(self):
-        # TODO: implement
+        self.screen_proxy.clear_screen()
         self.memory.increment_program_counter()
 
     def _00ee(self):
@@ -144,18 +145,19 @@ class Chip8:
 
     def _ex9e(self):
         # TODO: implement
-        self.memory.increment_program_counter()
+        pass
 
     def _exa1(self):
         # TODO: implement
-        self.memory.increment_program_counter()
+        pass
 
     def _fx07(self, vx_index):
         self.memory.v_registers[vx_index] = self.memory.delay_timer
         self.memory.increment_program_counter()
 
     def _fx0a(self, vx_index):
-        # TODO: implement
+        key = self.keyboard.wait_for_key()
+        self.memory.v_registers[vx_index] = key
         self.memory.increment_program_counter()
 
     def _fx15(self, vx_index):
@@ -260,5 +262,6 @@ class Chip8:
         while True:
             opcode = self.memory.get_current_opcode()
             operation, parameters = parse_operation_and_parameters(opcode)
+            self._debug(opcode, operation)
             self._execute_operation(operation, parameters)
-            self._debug(opcode)
+            self.keyboard.listen()

@@ -21,5 +21,8 @@ class PygameScreen:
     def draw_pixel(self, x, y):
         pygame.draw.line(self.screen, self._PIXEL_COLOR_RGB, (x, y), (x, y))
 
+    def clear_pixel(self, x, y):
+        pygame.draw.line(self.screen, self._SCREEN_COLOR_RGB, (x, y), (x, y))
+
     def refresh(self):
         pygame.display.flip()

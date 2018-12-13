@@ -10,6 +10,7 @@ class Chip8Test(unittest.TestCase):
                     v_registers=[None] * 16, i_register=None,
                     program_memory=[None] * 4096, delay_timer=None, sound_timer=None):
         screen_mock = mock.Mock()
+        keyboard_mock = mock.Mock()
         memory = Memory()
         memory.program_counter = program_counter
         memory.stack = stack
@@ -19,7 +20,7 @@ class Chip8Test(unittest.TestCase):
         memory.delay_timer = delay_timer
         memory.sound_timer = sound_timer
 
-        chip8 = Chip8(screen_mock)
+        chip8 = Chip8(screen_mock, keyboard_mock)
         chip8.memory = memory
 
         return chip8

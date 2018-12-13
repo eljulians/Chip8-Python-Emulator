@@ -16,6 +16,7 @@ class ScreenProxy:
         self.screen.init()
 
     def clear_screen(self):
+        self._init_screen_buffer_to_0()
         self.screen.clear()
 
     def _init_screen_buffer_to_0(self):
@@ -31,6 +32,8 @@ class ScreenProxy:
             for _ in segment_row:
                 if segment[segment_row_index][segment_column_index]:
                     self.screen.draw_pixel(current_x, current_y)
+                else:
+                    self.screen.clear_pixel(current_x, current_y)
                 current_x += 1
                 segment_column_index += 1
             segment_row_index += 1
