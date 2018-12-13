@@ -4,8 +4,9 @@ from chip8_emulator.screen import Screen
 
 class ScreenTest(unittest.TestCase):
 
-    def _init_screen(self, frame_buffer=None):
+    def _init_screen(self, frame_buffer=None, scalation_factor=1):
         screen = Screen()
+        screen._SCALATION_FACTOR = scalation_factor
 
         if frame_buffer is not None:
             screen._frame_buffer = frame_buffer
@@ -79,5 +80,25 @@ class ScreenTest(unittest.TestCase):
             0xFFFFFF, 0xFFFFFF, 0xFFFFFF,
         ]
         actual_sprite = screen._scale_sprite(original_sprite)
+
+        self.assertEqual(expected_sprite, actual_sprite)
+
+    def test_get_sprite_bit_matrix_to_draw(self):
+        original_sprite = [0xFF, 0xC0, 0xC0, 0xC0, 0xC0, 0xFF]  # C
+        sprite_x = 20
+        sprite_y = 10
+        frame_buffer = self._init_frame_buffer_with_sprite(original_sprite,
+                                                           sprite_x, sprite_y)
+        screen = self._init_screen(frame_buffer)
+
+        expected_sprite = [[0] * 8 for _ in range(6)]
+        expected_sprite[0] = [1] * 8
+        expected_sprite[1] = [1, 1, 0, 0, 0, 0, 0, 0]
+        expected_sprite[2] = [1, 1, 0, 0, 0, 0, 0, 0]
+        expected_sprite[3] = [1, 1, 0, 0, 0, 0, 0, 0]
+        expected_sprite[4] = [1, 1, 0, 0, 0, 0, 0, 0]
+        expected_sprite[5] = [1] * 8
+
+        actual_sprite = screen._get_segment_bit_matrix_to_draw(sprite_x, sprite_y, 8, 6)
 
         self.assertEqual(expected_sprite, actual_sprite)
