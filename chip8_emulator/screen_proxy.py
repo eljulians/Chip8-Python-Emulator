@@ -1,33 +1,25 @@
-from threading import Thread
-import pygame
 
-
-class Screen(Thread):
+class ScreenProxy:
 
     _SPRITE_WIDTH_BITS = 8
     _SCALATION_FACTOR = 8
     _WIDTH = 64 * _SCALATION_FACTOR
     _HEIGHT = 32 * _SCALATION_FACTOR
-    _SCREEN_COLOR_RGB = (0, 0, 0)
-    _PIXEL_COLOR_RGB = (255, 255, 255)
 
-    def __init__(self):
-        Thread.__init__(self)
+    def __init__(self, screen):
+        self.screen = screen
+        self.screen.width = self._WIDTH
+        self.screen.height = self._HEIGHT
         self._init_screen_buffer_to_0()
-        self.screen = None
 
     def init_screen(self):
-        self.screen = pygame.display.set_mode((self._WIDTH, self._HEIGHT))
+        self.screen.init()
 
-    def _clear_screen(self):
-        self.screen.fill(self._SCREEN_COLOR_RGB)
-        pygame.display.flip()
+    def clear_screen(self):
+        self.screen.clear()
 
     def _init_screen_buffer_to_0(self):
-        self._screen_buffer = [[0] * self._WIDTH for i in range(self._HEIGHT)]
-
-    def _draw_pixel(self, x, y):
-        pygame.draw.line(self.screen, self._PIXEL_COLOR_RGB, (x, y), (x, y))
+        self._screen_buffer = [[0] * self._WIDTH for _ in range(self._HEIGHT)]
 
     def _refresh_segment(self, segment, initial_x, initial_y):
         segment_row_index = 0
@@ -38,13 +30,13 @@ class Screen(Thread):
             segment_column_index = 0
             for _ in segment_row:
                 if segment[segment_row_index][segment_column_index]:
-                    self._draw_pixel(current_x, current_y)
+                    self.screen.draw_pixel(current_x, current_y)
                 current_x += 1
                 segment_column_index += 1
             segment_row_index += 1
             current_y += 1
 
-        pygame.display.flip()
+        self.screen.refresh()
 
     def _get_segment_bit_matrix_to_draw(self, row_index_begin,
                                         column_index_begin, sprite_width,
@@ -125,6 +117,3 @@ class Screen(Thread):
         )
 
         self._refresh_segment(segment_to_draw, buffer_column, buffer_row)
-
-    def run(self):
-        print('Thread started')

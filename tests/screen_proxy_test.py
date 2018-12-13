@@ -1,11 +1,13 @@
 import unittest
-from chip8_emulator.screen import Screen
+from unittest import mock
+from chip8_emulator.screen_proxy import ScreenProxy
 
 
-class ScreenTest(unittest.TestCase):
+class ScreenProxyTest(unittest.TestCase):
 
     def _init_screen(self, screen_buffer=None, scalation_factor=1):
-        screen = Screen()
+        screen_implementation_mock = mock.Mock()
+        screen = ScreenProxy(screen_implementation_mock)
         screen._SCALATION_FACTOR = scalation_factor
 
         if screen_buffer is not None:
