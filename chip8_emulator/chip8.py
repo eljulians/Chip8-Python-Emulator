@@ -1,4 +1,5 @@
 import random
+from .screen_proxy import ScreenProxy
 from .opcode_parser import parse_operation_and_parameters
 from .memory import Memory
 
@@ -7,7 +8,7 @@ class Chip8:
 
     def __init__(self, screen):
         self.memory = Memory()
-        self.screen = screen
+        self.screen_proxy = ScreenProxy(screen)
 
     def _00e0(self):
         # TODO: implement
@@ -138,7 +139,7 @@ class Chip8:
         sprite_address_start = self.memory.i_register
         sprite_address_end = sprite_address_start + sprite_height
         sprite = self.memory.program_memory[sprite_address_start:sprite_address_end]
-        self.screen.draw_sprite(sprite, x_coordinate, y_coordinate)
+        self.screen_proxy.draw_sprite(sprite, x_coordinate, y_coordinate)
         self.memory.increment_program_counter()
 
     def _ex9e(self):
@@ -184,7 +185,8 @@ class Chip8:
         self.memory.increment_program_counter()
 
     def _fx55(self, vx_index):
-        addresses = self.memory.get_addresses_from_i_register_to_offset(vx_index)
+        addresses = self.memory.get_addresses_from_i_register_to_offset(
+            vx_index)
         v_register_values = self.memory.v_registers[:vx_index]
 
         for address in addresses:
@@ -193,7 +195,8 @@ class Chip8:
         self.memory.increment_program_counter()
 
     def _fx65(self, vx_index):
-        addresses = self.memory.get_addresses_from_i_register_to_offset(vx_index)
+        addresses = self.memory.get_addresses_from_i_register_to_offset(
+            vx_index)
 
         for v_index in range(0, vx_index):
             address = addresses.pop(0)
@@ -253,7 +256,7 @@ class Chip8:
     def main(self, rom_name):
         with open('roms/{0}.rom'.format(rom_name), 'rb') as rom_handle:
             self.memory.load_rom(rom_handle)
-        self.screen.init_screen()
+        self.screen_proxy.init_screen()
         while True:
             opcode = self.memory.get_current_opcode()
             operation, parameters = parse_operation_and_parameters(opcode)
