@@ -173,7 +173,9 @@ class Chip8:
         self.memory.increment_program_counter()
 
     def _fx29(self, vx_index):
-        # TODO: implement
+        sprite_value = self.memory.v_registers[vx_index]
+        sprite_address = self.memory.get_address_of_preloaded_sprite(sprite_value)
+        self.memory.i_register = sprite_address
         self.memory.increment_program_counter()
 
     def _fx33(self, vx_index):

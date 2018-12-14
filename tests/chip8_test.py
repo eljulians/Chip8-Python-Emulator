@@ -7,7 +7,7 @@ from chip8_emulator.memory import Memory
 class Chip8Test(unittest.TestCase):
 
     def _init_chip8(self, program_counter=0x200, stack_pointer=0xEA0, stack=[],
-                    v_registers=[None] * 16, i_register=None,
+                    v_registers=[0x00] * 16, i_register=None,
                     program_memory=[None] * 4096, delay_timer=None, sound_timer=None):
         screen_mock = mock.Mock()
         keyboard_mock = mock.Mock()
@@ -569,7 +569,19 @@ class Chip8Test(unittest.TestCase):
         self.assertEqual(expected_i_register, actual_i_register)
 
     def test_fx29(self):
-        self.fail('Not yet implemented')
+        v_registers = [0x00] * 16
+        vx_index = 0x7
+        sprite_character = 0xA
+        v_registers[vx_index] = sprite_character
+        chip8 = self._init_chip8(v_registers=v_registers)
+
+        chip8._fx29(vx_index)
+
+        preloaded_sprites_addresses = list(chip8.memory.PRELOADED_SPRITES)
+        expected_i_register = preloaded_sprites_addresses[sprite_character]
+        actual_i_register = chip8.memory.i_register
+
+        self.assertEqual(expected_i_register, actual_i_register)
 
     def test_fx33(self):
         v_registers = [None] * 16
