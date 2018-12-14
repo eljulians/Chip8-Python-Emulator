@@ -144,6 +144,7 @@ class Chip8:
         sprite_address_end = sprite_address_start + sprite_height
         sprite = self.memory.program_memory[sprite_address_start:sprite_address_end]
         self.screen_proxy.draw_sprite(sprite, x_coordinate, y_coordinate)
+        self.memory.v_registers[0xF] = self.screen_proxy.collision
         self.memory.increment_program_counter()
 
     def _ex9e(self, vx_index):

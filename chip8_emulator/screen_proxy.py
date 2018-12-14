@@ -10,6 +10,7 @@ class ScreenProxy:
         self.screen = screen
         self.screen.width = self._WIDTH
         self.screen.height = self._HEIGHT
+        self.collision = False
         self._init_screen_buffer_to_0()
 
     def init_screen(self):
@@ -66,13 +67,20 @@ class ScreenProxy:
 
         return column
 
+    def _set_collision(self, pixel_before, pixel_after):
+        if pixel_before and not pixel_after:
+            self.collision = True
+
     def _set_bit_row_to_screen_buffer(self, sprite_row_bitstring, buffer_row,
                                       buffer_column):
         for sprite_column_bitchar in sprite_row_bitstring:
             sprite_column_bit_int = int(sprite_column_bitchar)
             buffer_row = self._wrap_row_if_overflow(buffer_row)
             buffer_column = self._wrap_column_if_overflow(buffer_column)
-            self._screen_buffer[buffer_row][buffer_column] ^= sprite_column_bit_int
+            pixel_before_xor = self._screen_buffer[buffer_row][buffer_column]
+            pixel_after_xor = pixel_before_xor ^ sprite_column_bit_int
+            self._set_collision(pixel_before_xor, pixel_after_xor)
+            self._screen_buffer[buffer_row][buffer_column] = pixel_after_xor
             buffer_column += 1
 
     def _update_screen_buffer(self, sprite, buffer_row, buffer_column):
@@ -107,6 +115,7 @@ class ScreenProxy:
         return scaled_sprite
 
     def draw_sprite(self, sprite, buffer_column, buffer_row):
+        self.collision = False
         scaled_sprite = self._scale_sprite(sprite)
         buffer_column *= self._SCALATION_FACTOR
         buffer_row *= self._SCALATION_FACTOR
