@@ -272,3 +272,4 @@ class Chip8:
             self._debug(opcode, operation)
             self._execute_operation(operation, parameters)
             self.keyboard.listen()
+            self.memory.decrement_delay_timer()

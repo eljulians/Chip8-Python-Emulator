@@ -37,7 +37,7 @@ class Memory:
         self.program_counter = 0x200
         self.v_registers = [0x00] * self.V_REGISTERS_LENGTH_BYTES
         self.i_register = None
-        self.delay_timer = None
+        self.delay_timer = 0
         self.sound_timer = None
         self._load_digit_sprites()
 
@@ -75,3 +75,7 @@ class Memory:
         for rom_byte in rom_handle.read():
             self.program_memory[memory_index] = rom_byte
             memory_index += 1
+
+    def decrement_delay_timer(self):
+        if self.delay_timer > 0:
+            self.delay_timer -= 1
