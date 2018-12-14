@@ -41,7 +41,7 @@ class Chip8Test(unittest.TestCase):
         chip8 = self._init_chip8(program_counter, stack_pointer, stack)
         chip8._00ee()
 
-        expected_program_counter = 0x25F
+        expected_program_counter = 0x261
         actual_program_counter = chip8.memory.program_counter
 
         self.assertEqual(expected_program_counter, actual_program_counter)
@@ -531,11 +531,84 @@ class Chip8Test(unittest.TestCase):
 
         screen_proxy_mock.draw_sprite.assert_called_with(sprite, vx_value, vy_value)
 
-    def test_ex9e(self):
-        self.fail('Not yet implemented')
+    def test_ex9e__equals(self):
+        keyboard_mock = mock.Mock()
+        keyboard_return_value = 0x77
+        keyboard_mock.get_pressed_key.return_value = keyboard_return_value
+        v_registers = [0x00] * 16
+        vx_index = 0x3
+        vx_value = keyboard_return_value
+        v_registers[vx_index] = vx_value
+        program_counter = 0x300
+        chip8 = self._init_chip8(v_registers=v_registers,
+                                 program_counter=program_counter)
+        chip8.keyboard = keyboard_mock
 
-    def test_exa1(self):
-        self.fail('Not yet implemented')
+        chip8._ex9e(vx_index)
+
+        expected_program_counter = 0x304
+        actual_program_counter = chip8.memory.program_counter
+
+        self.assertEqual(expected_program_counter, actual_program_counter)
+
+    def test_ex9e__not_equals(self):
+        keyboard_mock = mock.Mock()
+        keyboard_return_value = 0x65
+        keyboard_mock.get_pressed_key.return_value = keyboard_return_value
+        v_registers = [0x00] * 16
+        vx_index = 0x3
+        vx_value = 0x77
+        v_registers[vx_index] = vx_value
+        program_counter = 0x300
+        chip8 = self._init_chip8(v_registers=v_registers,
+                                 program_counter=program_counter)
+        chip8.keyboard = keyboard_mock
+
+        chip8._ex9e(vx_index)
+
+        expected_program_counter = 0x302
+        actual_program_counter = chip8.memory.program_counter
+
+        self.assertEqual(expected_program_counter, actual_program_counter)
+
+    def test_exa1__equals(self):
+        keyboard_mock = mock.Mock()
+        keyboard_return_value = 0x61
+        keyboard_mock.get_pressed_key.return_value = keyboard_return_value
+        v_registers = [0x00] * 16
+        vx_index = 0x3
+        vx_value = keyboard_return_value
+        v_registers[vx_index] = vx_value
+        program_counter = 0x715
+        chip8 = self._init_chip8(v_registers=v_registers,
+                                 program_counter=program_counter)
+        chip8.keyboard = keyboard_mock
+
+        chip8._exa1(vx_index)
+
+        expected_program_counter = 0x717
+        actual_program_counter = chip8.memory.program_counter
+
+        self.assertEqual(expected_program_counter, actual_program_counter)
+
+    def test_exa1__not_equals(self):
+        keyboard_mock = mock.Mock()
+        keyboard_return_value = 0x61
+        keyboard_mock.get_pressed_key.return_value = keyboard_return_value
+        v_registers = [0x00] * 16
+        vx_index = 0x3
+        v_registers[vx_index] = 0x73
+        program_counter = 0x715
+        chip8 = self._init_chip8(v_registers=v_registers,
+                                 program_counter=program_counter)
+        chip8.keyboard = keyboard_mock
+
+        chip8._exa1(vx_index)
+
+        expected_program_counter = 0x719
+        actual_program_counter = chip8.memory.program_counter
+
+        self.assertEqual(expected_program_counter, actual_program_counter)
 
     def test_fx07(self):
         delay_timer = 0x05

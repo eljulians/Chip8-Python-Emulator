@@ -18,6 +18,7 @@ class Chip8:
     def _00ee(self):
         program_counter = self.memory.pop_from_stack()
         self.memory.program_counter = program_counter
+        self.memory.increment_program_counter()
 
     def _1nnn(self, address):
         self.memory.program_counter = address
@@ -143,13 +144,17 @@ class Chip8:
         self.screen_proxy.draw_sprite(sprite, x_coordinate, y_coordinate)
         self.memory.increment_program_counter()
 
-    def _ex9e(self):
-        # TODO: implement
-        pass
+    def _ex9e(self, vx_index):
+        self.memory.increment_program_counter()
 
-    def _exa1(self):
-        # TODO: implement
-        pass
+        if self.memory.v_registers[vx_index] == self.keyboard.get_pressed_key():
+            self.memory.increment_program_counter()
+
+    def _exa1(self, vx_index):
+        self.memory.increment_program_counter()
+
+        if self.memory.v_registers[vx_index] != self.keyboard.get_pressed_key():
+            self.memory.increment_program_counter()
 
     def _fx07(self, vx_index):
         self.memory.v_registers[vx_index] = self.memory.delay_timer

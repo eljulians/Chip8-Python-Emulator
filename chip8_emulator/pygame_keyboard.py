@@ -12,6 +12,9 @@ class PygameKeyboard:
             elif event.type == pygame.KEYUP:
                 self.pressed_key = None
 
+    def get_pressed_key(self):
+        return self.pressed_key
+
     def wait_for_key(self):
         waiting = True
 
