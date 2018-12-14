@@ -55,13 +55,13 @@ class ScreenProxy:
         return segment
 
     def _wrap_row_if_overflow(self, row):
-        if row >= self._HEIGHT:
+        while row >= self._HEIGHT:
             row = row - self._HEIGHT
 
         return row
 
     def _wrap_column_if_overflow(self, column):
-        if column >= self._WIDTH:
+        while column >= self._WIDTH:
             column = column - self._WIDTH
 
         return column

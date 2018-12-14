@@ -50,7 +50,9 @@ class Chip8:
         self.memory.increment_program_counter()
 
     def _7xkk(self, v_index, value):
-        self.memory.v_registers[v_index] += value
+        addition_result = self.memory.v_registers[v_index] + value
+        addition_result_last_8_bits = addition_result & 0xFF
+        self.memory.v_registers[v_index] = addition_result_last_8_bits
         self.memory.increment_program_counter()
 
     def _8xy0(self, vx_index, vy_index):
