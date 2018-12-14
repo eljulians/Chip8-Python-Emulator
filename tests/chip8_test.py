@@ -646,7 +646,7 @@ class Chip8Test(unittest.TestCase):
                          actual_i2_memory_location_value)
 
     def test_fx55(self):
-        v_registers = [0x14, 0xF4, 0x61, 0xDE]
+        v_registers = [0x14, 0xF4, 0x61, 0xDE, 0xAE]
         memory = [None] * 4096
         vx_index = 0x4
         i_register = 0x7A4
@@ -663,6 +663,8 @@ class Chip8Test(unittest.TestCase):
         actual_i2_memory_location_value = chip8.memory.program_memory[0x7A6]
         expected_i3_memory_location_value = 0xDE
         actual_i3_memory_location_value = chip8.memory.program_memory[0x7A7]
+        expected_i4_memory_location_value = 0xAE
+        actual_i4_memory_location_value = chip8.memory.program_memory[0x7A8]
 
         self.assertEqual(expected_i0_memory_location_value,
                          actual_i0_memory_location_value)
@@ -672,6 +674,8 @@ class Chip8Test(unittest.TestCase):
                          actual_i2_memory_location_value)
         self.assertEqual(expected_i3_memory_location_value,
                          actual_i3_memory_location_value)
+        self.assertEqual(expected_i4_memory_location_value,
+                         actual_i4_memory_location_value)
 
     def test_fx65(self):
         v_registers = [None] * 16
@@ -682,6 +686,7 @@ class Chip8Test(unittest.TestCase):
         memory[0x5DB] = 0xAE
         memory[0x5DC] = 0x81
         memory[0x5DD] = 0xDA
+        memory[0x5DE] = 0x15
         chip8 = self._init_chip8(v_registers=v_registers,
                                  i_register=i_register, program_memory=memory)
 
@@ -695,11 +700,14 @@ class Chip8Test(unittest.TestCase):
         actual_v2_value = chip8.memory.v_registers[0x2]
         expected_v3_value = 0xDA
         actual_v3_value = chip8.memory.v_registers[0x3]
+        expected_v4_value = 0x15
+        actual_v4_value = chip8.memory.v_registers[0x4]
 
         self.assertEqual(expected_v0_value, actual_v0_value)
         self.assertEqual(expected_v1_value, actual_v1_value)
         self.assertEqual(expected_v2_value, actual_v2_value)
         self.assertEqual(expected_v3_value, actual_v3_value)
+        self.assertEqual(expected_v4_value, actual_v4_value)
 
     @mock.patch('chip8_emulator.chip8.Chip8._1nnn')
     def test_execute_operation__1nnn(self, mocked_1nnn):

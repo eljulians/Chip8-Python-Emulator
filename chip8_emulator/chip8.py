@@ -190,8 +190,8 @@ class Chip8:
 
     def _fx55(self, vx_index):
         addresses = self.memory.get_addresses_from_i_register_to_offset(
-            vx_index)
-        v_register_values = self.memory.v_registers[:vx_index]
+            vx_index + 1)
+        v_register_values = self.memory.v_registers[:vx_index + 1]
 
         for address in addresses:
             self.memory.program_memory[address] = v_register_values.pop(0)
@@ -200,9 +200,9 @@ class Chip8:
 
     def _fx65(self, vx_index):
         addresses = self.memory.get_addresses_from_i_register_to_offset(
-            vx_index)
+            vx_index + 1)
 
-        for v_index in range(0, vx_index):
+        for v_index in range(0, vx_index + 1):
             address = addresses.pop(0)
             self.memory.v_registers[v_index] = self.memory.program_memory[address]
 
