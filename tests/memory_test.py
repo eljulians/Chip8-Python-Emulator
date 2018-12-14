@@ -79,8 +79,6 @@ class MemoryTest(unittest.TestCase):
     def test_load_digit_sprites(self):
         memory = self._init_memory()
 
-        memory._load_digit_sprites()
-
         expected_program_memory = [0x00] * 0xE9F
         expected_program_memory[0x000:0x050] = [
             0xF0, 0x90, 0x90, 0x90, 0xF0,  # 0
@@ -103,3 +101,12 @@ class MemoryTest(unittest.TestCase):
         actual_program_memory = memory.program_memory
 
         self.assertEqual(expected_program_memory, actual_program_memory)
+
+    def test_get_address_of_preloaded_sprite(self):
+        memory = self._init_memory()
+        input_sprite = 0xC
+
+        expected_sprite_address = 0x03C
+        actual_sprite_address = memory.get_address_of_preloaded_sprite(input_sprite)
+
+        self.assertEqual(expected_sprite_address, actual_sprite_address)

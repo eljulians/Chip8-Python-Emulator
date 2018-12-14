@@ -25,8 +25,13 @@ class Chip8Test(unittest.TestCase):
 
         return chip8
 
-    def test_00e0(self):
-        self.fail('Not yet implemented')
+    @mock.patch('chip8_emulator.screen_proxy.ScreenProxy.clear_screen')
+    def test_00e0(self, mocked_clear_screen):
+        chip8 = self._init_chip8()
+
+        chip8._00e0()
+
+        self.assertTrue(mocked_clear_screen.called)
 
     def test_00ee(self):
         program_counter = 0x317
@@ -504,7 +509,27 @@ class Chip8Test(unittest.TestCase):
         self.assertEqual(expected_vx_value, actual_vx_value)
 
     def test_dxyn(self):
-        self.fail('Not yet implemented')
+        screen_proxy_mock = mock.Mock()
+        v_registers = [None] * 16
+        vx_index = 0x4
+        vy_index = 0x6
+        vx_value = 0x15
+        vy_value = 0x20
+        v_registers[vx_index] = vx_value
+        v_registers[vy_index] = vy_value
+        sprite = [0xFA, 0xC0, 0xAE, 0x15]
+        sprite_memory_address = 0x317
+        program_memory = [0x00] * 0xE9F
+        program_memory[sprite_memory_address:sprite_memory_address+len(sprite)]=sprite
+        i_register = sprite_memory_address
+        chip8 = self._init_chip8(v_registers=v_registers,
+                                 i_register=i_register,
+                                 program_memory=program_memory)
+        chip8.screen_proxy = screen_proxy_mock
+
+        chip8._dxyn(vx_index, vy_index, len(sprite))
+
+        screen_proxy_mock.draw_sprite.assert_called_with(sprite, vx_value, vy_value)
 
     def test_ex9e(self):
         self.fail('Not yet implemented')
@@ -525,7 +550,19 @@ class Chip8Test(unittest.TestCase):
         self.assertEqual(expected_vx_value, actual_vx_value)
 
     def test_fx0a(self):
-        self.fail('Not yet implemented')
+        keyboard_mock = mock.Mock()
+        keyboard_return_value = 0x71
+        keyboard_mock.wait_for_key.return_value = keyboard_return_value
+        vx_index = 0x7
+        chip8 = self._init_chip8()
+        chip8.keyboard = keyboard_mock
+
+        chip8._fx0a(vx_index)
+
+        expected_vx_value = keyboard_return_value
+        actual_vx_value = chip8.memory.v_registers[vx_index]
+
+        self.assertEqual(expected_vx_value, actual_vx_value)
 
     def test_fx15(self):
         v_registers = [None] * 16
