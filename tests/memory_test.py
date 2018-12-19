@@ -37,7 +37,7 @@ class MemoryTest(unittest.TestCase):
         rom_path = 'roms/pong.rom'
 
         with open(rom_path, 'rb') as rom_handle:
-            memory.load_rom(rom_handle)
+            memory.load_rom(rom_handle.read())
 
         expected_rom = [
             0x6A, 0x2, 0x6B, 0xC, 0x6C, 0x3F, 0x6D, 0xC, 0xA2, 0xEA,

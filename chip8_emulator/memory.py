@@ -73,10 +73,10 @@ class Memory:
     def get_addresses_from_i_register_to_offset(self, offset):
         return [self.i_register + index for index in range(0, offset)]
 
-    def load_rom(self, rom_handle):
+    def load_rom(self, rom_bytes):
         memory_index = 0x200
 
-        for rom_byte in rom_handle.read():
+        for rom_byte in rom_bytes:
             self.program_memory[memory_index] = rom_byte
             memory_index += 1
 

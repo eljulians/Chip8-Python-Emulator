@@ -2,6 +2,7 @@ import random
 from .screen_proxy import ScreenProxy
 from .opcode_parser import parse_operation_and_parameters
 from .memory import Memory
+from .delay_timer_thread import DelayTimerThread
 
 
 class Chip8:
@@ -10,6 +11,7 @@ class Chip8:
         self.memory = Memory()
         self.screen_proxy = ScreenProxy(screen)
         self.keyboard = keyboard
+        self.delay_timer_thread = DelayTimerThread(self.memory)
 
     def _00e0(self):
         self.screen_proxy.clear_screen()
@@ -248,11 +250,16 @@ class Chip8:
         elif operation_name_in_class.startswith('_d'):
             operation_function(parameters[0], parameters[1], parameters[2])
 
-    def main(self, rom_name):
-        with open('roms/{0}.rom'.format(rom_name), 'rb') as rom_handle:
-            self.memory.load_rom(rom_handle)
+    def _get_rom_bytes(self, rom_path):
+        with open(rom_path, 'rb') as rom_handle:
+            rom_bytes = rom_handle.read()
 
+        return rom_bytes
+
+    def main(self, rom_path):
+        self.memory.load_rom(self._get_rom_bytes(rom_path))
         self.screen_proxy.init_screen()
+        self.delay_timer_thread.start()
 
         while True:
             opcode = self.memory.get_current_opcode()
