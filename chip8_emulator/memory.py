@@ -40,9 +40,9 @@ class Memory:
         self.program_counter = 0x200
         self.v_registers = [0x00] * self.V_REGISTERS_LENGTH_BYTES
         self.i_register = None
-        self.delay_timer = 0
-        self.sound_timer = None
+        self._delay_timer = 0
         self._delay_timer_mutex = Lock()
+        self.sound_timer = None
         self._load_digit_sprites()
 
     def _load_digit_sprites(self):
@@ -83,12 +83,17 @@ class Memory:
     def decrement_delay_timer(self):
         self._delay_timer_mutex.acquire()
 
-        if self.delay_timer > 0:
-            self.delay_timer -= 1
+        if self._delay_timer > 0:
+            self._delay_timer -= 1
 
         self._delay_timer_mutex.release()
 
-    def set_delay_timer(self, delay_timer):
+    def set_delay_timer_to_v_value(self, v_index):
         self._delay_timer_mutex.acquire()
-        self._delay_timer = delay_timer
+        self._delay_timer = self.v_registers[v_index]
+        self._delay_timer_mutex.release()
+
+    def set_v_value_to_delay_timer(self, v_index):
+        self._delay_timer_mutex.acquire()
+        self.v_registers[v_index] = self._delay_timer
         self._delay_timer_mutex.release()

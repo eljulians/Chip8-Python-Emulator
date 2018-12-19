@@ -17,7 +17,7 @@ class Chip8Test(unittest.TestCase):
         memory.v_registers = v_registers
         memory.i_register = i_register
         memory.program_memory = program_memory
-        memory.delay_timer = delay_timer
+        memory._delay_timer = delay_timer
         memory.sound_timer = sound_timer
 
         chip8 = Chip8(screen_mock, keyboard_mock)
@@ -646,7 +646,7 @@ class Chip8Test(unittest.TestCase):
         chip8._fx15(vx_index)
 
         expected_delay_timer = 0xAE
-        actual_delay_timer = chip8.memory.delay_timer
+        actual_delay_timer = chip8.memory._delay_timer
 
         self.assertEqual(expected_delay_timer, actual_delay_timer)
 

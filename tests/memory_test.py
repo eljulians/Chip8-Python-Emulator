@@ -5,13 +5,15 @@ from chip8_emulator.memory import Memory
 
 class MemoryTest(unittest.TestCase):
 
-    def _init_memory(self, program_memory=None, program_counter=0x200):
+    def _init_memory(self, program_memory=None, program_counter=0x200,
+                     delay_timer=0):
         memory = Memory()
 
         if program_memory is not None:
             memory.program_memory = program_memory
 
         memory.program_counter = program_counter
+        memory._delay_timer = delay_timer
 
         return memory
 
@@ -110,3 +112,25 @@ class MemoryTest(unittest.TestCase):
         actual_sprite_address = memory.get_address_of_preloaded_sprite(input_sprite)
 
         self.assertEqual(expected_sprite_address, actual_sprite_address)
+
+    def test_decrement_delay_timer__greater_than_0(self):
+        initial_delay_timer = 174
+        memory = self._init_memory(delay_timer=initial_delay_timer)
+
+        memory.decrement_delay_timer()
+
+        expected_delay_timer = initial_delay_timer - 1
+        actual_delay_timer = memory._delay_timer
+
+        self.assertEqual(expected_delay_timer, actual_delay_timer)
+
+    def test_decrement_delay_timer__equal_to_0(self):
+        initial_delay_timer = 0
+        memory = self._init_memory(delay_timer=initial_delay_timer)
+
+        memory.decrement_delay_timer()
+
+        expected_delay_timer = 0
+        actual_delay_timer = memory._delay_timer
+
+        self.assertEqual(expected_delay_timer, actual_delay_timer)

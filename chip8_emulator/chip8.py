@@ -162,7 +162,7 @@ class Chip8:
             self.memory.increment_program_counter()
 
     def _fx07(self, vx_index):
-        self.memory.v_registers[vx_index] = self.memory.delay_timer
+        self.memory.set_v_value_to_delay_timer(vx_index)
         self.memory.increment_program_counter()
 
     def _fx0a(self, vx_index):
@@ -171,7 +171,7 @@ class Chip8:
         self.memory.increment_program_counter()
 
     def _fx15(self, vx_index):
-        self.memory.delay_timer = self.memory.v_registers[vx_index]
+        self.memory.set_delay_timer_to_v_value(vx_index)
         self.memory.increment_program_counter()
 
     def _fx18(self, vx_index):
