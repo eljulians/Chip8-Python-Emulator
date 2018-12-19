@@ -248,31 +248,14 @@ class Chip8:
         elif operation_name_in_class.startswith('_d'):
             operation_function(parameters[0], parameters[1], parameters[2])
 
-    def _debug(self, opcode):
-        print('>>> after {0}'.format(hex(int.from_bytes(opcode, 'big'))[2:]))
-        print('> Program counter: ' + hex(self.memory.program_counter))
-        v_registers = []
-        for v in self.memory.v_registers:
-            try:
-                v_registers.append(hex(v))
-            except TypeError:
-                v_registers.append('0x00')
-        print('> V registers: ' + ','.join(v for v in v_registers))
-
-        try:
-            i_register = hex(self.memory.i_register)
-        except TypeError:
-            i_register = 'None'
-        print('> I register: ' + i_register)
-
     def main(self, rom_name):
         with open('roms/{0}.rom'.format(rom_name), 'rb') as rom_handle:
             self.memory.load_rom(rom_handle)
+
         self.screen_proxy.init_screen()
+
         while True:
             opcode = self.memory.get_current_opcode()
             operation, parameters = parse_operation_and_parameters(opcode)
-            self._debug(opcode, operation)
             self._execute_operation(operation, parameters)
             self.keyboard.listen()
-            self.memory.decrement_delay_timer()

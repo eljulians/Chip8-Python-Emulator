@@ -1,3 +1,6 @@
+from threading import Lock
+
+
 class Memory:
     """
     Memory map
@@ -39,6 +42,7 @@ class Memory:
         self.i_register = None
         self.delay_timer = 0
         self.sound_timer = None
+        self._delay_timer_mutex = Lock()
         self._load_digit_sprites()
 
     def _load_digit_sprites(self):
@@ -77,5 +81,14 @@ class Memory:
             memory_index += 1
 
     def decrement_delay_timer(self):
+        self._delay_timer_mutex.acquire()
+
         if self.delay_timer > 0:
             self.delay_timer -= 1
+
+        self._delay_timer_mutex.release()
+
+    def set_delay_timer(self, delay_timer):
+        self._delay_timer_mutex.acquire()
+        self._delay_timer = delay_timer
+        self._delay_timer_mutex.release()

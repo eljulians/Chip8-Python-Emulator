@@ -1,5 +1,6 @@
 import pygame
 
+
 class PygameKeyboard:
 
     KEY_MAPPINGS = {
@@ -30,6 +31,5 @@ class PygameKeyboard:
 
             if event.type == pygame.KEYDOWN:
                 waiting = False
-                key = event.unicode
 
-        return key
+        return self.KEY_MAPPINGS.get(event.unicode)
