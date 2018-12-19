@@ -104,3 +104,45 @@ class ScreenProxyTest(unittest.TestCase):
         actual_sprite = screen._get_segment_bit_matrix_to_draw(sprite_x, sprite_y, 8, 6)
 
         self.assertEqual(expected_sprite, actual_sprite)
+
+    def test_wrap_row_if_overflow__overflow(self):
+        screen = self._init_screen()
+        row_overflow = 23
+        row = screen._HEIGHT + row_overflow
+
+        expected_row = row - screen._HEIGHT
+        actual_row = screen._wrap_row_if_overflow(row)
+
+        self.assertEqual(expected_row, actual_row)
+
+    def test_wrap_column_if_overflow__overflow(self):
+        screen = self._init_screen()
+        column_overflow = 17
+        column = screen._WIDTH + column_overflow
+
+        expected_column = column - screen._WIDTH
+        actual_column = screen._wrap_column_if_overflow(column)
+
+        self.assertEqual(expected_column, actual_column)
+
+    def test_set_collision__collision(self):
+        screen = self._init_screen()
+        pixel_before = 1
+        pixel_after = 0
+
+        screen._set_collision(pixel_before, pixel_after)
+
+        actual_collision = screen.collision
+
+        self.assertTrue(actual_collision)
+
+    def test_set_collision__no_collision(self):
+        screen = self._init_screen()
+        pixel_before = 0
+        pixel_after = 0
+
+        screen._set_collision(pixel_before, pixel_after)
+
+        actual_collision = screen.collision
+
+        self.assertFalse(actual_collision)
