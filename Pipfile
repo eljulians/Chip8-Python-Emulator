@@ -7,9 +7,11 @@ verify_ssl = true
 tests = "coverage run --rcfile=.coveragerc -m tests.testsuite"
 cov-html = "coverage html"
 cov-stdout = "coverage report"
+lint = "pylint --rcfile=.pylintrc chip8_emulator"
 
 [dev-packages]
 coverage = "*"
+pylint = "*"
 
 [packages]
 pygame = "*"
