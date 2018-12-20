@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import Mock, call
+from unittest.mock import Mock, call, patch
 from chip8_emulator.screen_proxy import ScreenProxy
 
 
@@ -12,6 +12,8 @@ class ScreenProxyTest(unittest.TestCase):
 
         if screen_buffer is not None:
             screen_proxy._screen_buffer = screen_buffer
+
+        screen_proxy.init_screen()
 
         return screen_proxy
 
@@ -36,7 +38,8 @@ class ScreenProxyTest(unittest.TestCase):
         init_sprite = [0x18, 0x3C, 0x7E, 0x7E, 0x3C, 0x18, 0x18, 0x18, 0x18]
         x0 = 10
         y0 = 20
-        screen_buffer = self._init_screen_buffer_with_sprite(init_sprite, x0, y0)
+        screen_buffer = self._init_screen_buffer_with_sprite(
+            init_sprite, x0, y0)
         screen_proxy = self._init_screen_proxy(screen_buffer)
 
         input_sprite = [0x66, 0x42, 0x00, 0x00, 0x42, 0x66, 0x66, 0x66, 0x66]
@@ -101,7 +104,8 @@ class ScreenProxyTest(unittest.TestCase):
         expected_sprite[4] = [1, 1, 0, 0, 0, 0, 0, 0]
         expected_sprite[5] = [1] * 8
 
-        actual_sprite = screen_proxy._get_segment_bit_matrix_to_draw(sprite_x, sprite_y, 8, 6)
+        actual_sprite = screen_proxy._get_segment_bit_matrix_to_draw(
+            sprite_x, sprite_y, 8, 6)
 
         self.assertEqual(expected_sprite, actual_sprite)
 
@@ -162,13 +166,57 @@ class ScreenProxyTest(unittest.TestCase):
             call(10, 9), call(11, 9), call(12, 9), call(13, 9),
         ]
         expected_clear_pixel_calls = [
-            call(10, 5), call(11, 5), call(12, 5), call(13, 5), call(14, 5), call(15, 5), call(16, 5), call(17, 5),
+            call(10, 5), call(11, 5), call(12, 5), call(13, 5), call(
+                14, 5), call(15, 5), call(16, 5), call(17, 5),
             call(11, 6), call(13, 6), call(15, 6), call(17, 6),
-            call(10, 7), call(11, 7), call(12, 7), call(13, 7), call(14, 7), call(15, 7), call(16, 7), call(17, 7),
-            call(10, 8), call(11, 8), call(12, 8), call(13, 8), call(14, 8), call(15, 8), call(16, 8), call(17, 8),
+            call(10, 7), call(11, 7), call(12, 7), call(13, 7), call(
+                14, 7), call(15, 7), call(16, 7), call(17, 7),
+            call(10, 8), call(11, 8), call(12, 8), call(13, 8), call(
+                14, 8), call(15, 8), call(16, 8), call(17, 8),
             call(14, 9), call(15, 9), call(16, 9), call(17, 9),
         ]
-
-        screen_proxy.screen.draw_pixel.assert_has_calls(expected_draw_pixel_calls)
-        screen_proxy.screen.clear_pixel.assert_has_calls(expected_clear_pixel_calls)
+        screen_proxy.screen.draw_pixel.assert_has_calls(
+            expected_draw_pixel_calls
+        )
+        screen_proxy.screen.clear_pixel.assert_has_calls(
+            expected_clear_pixel_calls
+        )
         screen_proxy.screen.refresh.assert_called()
+
+    @patch('chip8_emulator.screen_proxy.ScreenProxy._update_screen_buffer')
+    @patch('chip8_emulator.screen_proxy.ScreenProxy._get_segment_bit_matrix_to_draw')
+    @patch('chip8_emulator.screen_proxy.ScreenProxy._refresh_segment')
+    def test_draw_sprite(self, mocked_refresh_segment,
+                         mocked_get_segment_bit_matrix_to_draw,
+                         mocked_update_screen_buffer):
+        scalation_factor = 2
+        sprite = [0xFF, 0x00, 0xFF]
+        scaled_sprite = [0xFFFF, 0xFFFF, 0x0000, 0x0000, 0xFFFF, 0xFFFF]
+        x = 10
+        y = 5
+        scaled_x = x * scalation_factor
+        scaled_y = y * scalation_factor
+        screen_proxy = self._init_screen_proxy(
+            scalation_factor=scalation_factor
+        )
+
+        mocked_get_segment_bit_matrix_to_draw.return_value = 'mocked_matrix'
+
+        screen_proxy.draw_sprite(sprite, x, y)
+
+        mocked_update_screen_buffer.assert_called_with(
+            scaled_sprite, scaled_y, scaled_x
+        )
+        mocked_get_segment_bit_matrix_to_draw.assert_called_with(
+            scaled_y, scaled_x, 16, len(scaled_sprite)
+        )
+        mocked_refresh_segment.assert_called_with(
+            'mocked_matrix', scaled_x, scaled_y
+        )
+
+    def test_clear_screen(self):
+        screen_proxy = self._init_screen_proxy()
+
+        screen_proxy.clear_screen()
+
+        screen_proxy.screen.clear.assert_called()
