@@ -1,6 +1,7 @@
 # CHIP-8 emulator
 
 [![Build Status](https://travis-ci.org/julenpardo/Chip8-Python-Emulator.svg?branch=master)](https://travis-ci.org/julenpardo/Chip8-Python-Emulator)
+[![Maintainability](https://api.codeclimate.com/v1/badges/226908a693cbce82ebf7/maintainability)](https://codeclimate.com/github/julenpardo/Chip8-Python-Emulator/maintainability)
 [![Coverage Status](https://coveralls.io/repos/github/julenpardo/Chip8-Python-Emulator/badge.svg?branch=master)](https://coveralls.io/github/julenpardo/Chip8-Python-Emulator?branch=master)
 ![Python](https://img.shields.io/badge/python-3.6%20%7C%203.7-blue.svg)
 
