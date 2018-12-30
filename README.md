@@ -2,8 +2,6 @@
 
 A CHIP-8 emulator.
 
-Python 3.7.
-
 ## Set up
 
 ```bash
