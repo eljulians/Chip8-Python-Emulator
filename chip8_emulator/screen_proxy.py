@@ -55,17 +55,11 @@ class ScreenProxy:
 
         return segment
 
-    def _wrap_row_if_overflow(self, row):
-        while row >= self._HEIGHT:
-            row = row - self._HEIGHT
+    def _wrap_if_overflow(self, value, limit):
+        while value >= limit:
+            value = value - limit
 
-        return row
-
-    def _wrap_column_if_overflow(self, column):
-        while column >= self._WIDTH:
-            column = column - self._WIDTH
-
-        return column
+        return value
 
     def _set_collision(self, pixel_before, pixel_after):
         if pixel_before and not pixel_after:
@@ -75,8 +69,8 @@ class ScreenProxy:
                                       buffer_column):
         for sprite_column_bitchar in sprite_row_bitstring:
             sprite_column_bit_int = int(sprite_column_bitchar)
-            buffer_row = self._wrap_row_if_overflow(buffer_row)
-            buffer_column = self._wrap_column_if_overflow(buffer_column)
+            buffer_row = self._wrap_if_overflow(buffer_row, self._HEIGHT)
+            buffer_column = self._wrap_if_overflow(buffer_column, self._WIDTH)
             pixel_before_xor = self._screen_buffer[buffer_row][buffer_column]
             pixel_after_xor = pixel_before_xor ^ sprite_column_bit_int
             self._set_collision(pixel_before_xor, pixel_after_xor)
