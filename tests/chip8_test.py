@@ -659,7 +659,7 @@ class Chip8Test(unittest.TestCase):
         chip8._fx18(vx_index)
 
         expected_sound_timer = 0x45
-        actual_sound_timer = chip8.memory.sound_timer
+        actual_sound_timer = chip8.memory._sound_timer
 
         self.assertEqual(expected_sound_timer, actual_sound_timer)
 

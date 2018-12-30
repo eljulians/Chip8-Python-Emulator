@@ -218,12 +218,8 @@ class Chip8:
 
         self.memory.increment_program_counter()
 
-    # No opcode methods #
-
     def _execute_operation(self, operation, parameters):
-        """
-        TODO: refactor operation calling
-        """
+        # @TODO: refactor operation calling
         operation_name_in_class = '_' + operation
         operation_function = getattr(self, operation_name_in_class)
         if operation_name_in_class.startswith('_00'):
@@ -256,13 +252,19 @@ class Chip8:
 
         return rom_bytes
 
-    def main(self, rom_path):
+    def _initialize(self, rom_path):
         self.memory.load_rom(self._get_rom_bytes(rom_path))
         self.screen_proxy.init_screen()
         self.delay_timer_thread.start()
 
+    def _mainloop(self):
+        opcode = self.memory.get_current_opcode()
+        operation, parameters = parse_operation_and_parameters(opcode)
+        self._execute_operation(operation, parameters)
+        self.keyboard.listen()
+
+    def main(self, rom_path):
+        self._initialize(rom_path)
+
         while True:
-            opcode = self.memory.get_current_opcode()
-            operation, parameters = parse_operation_and_parameters(opcode)
-            self._execute_operation(operation, parameters)
-            self.keyboard.listen()
+            self._mainloop()

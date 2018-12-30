@@ -2,17 +2,9 @@ from threading import Lock
 
 
 class Memory:
-    """
-    Memory map
-    0x000 - 0x1FF: CHIP8 interpreter itself; don't touch these addresses
-    0x200 - 0xE9F: program memory (3.231 bytes)
-    0xEA0 - 0xECF: stack (48 bytes)
-    0xED0 - 0xEFF: work area (48 bytes)
-        0xEFO - 0xEFF: v registers (16 bytes)
-    0xF00 - 0xFFF: display refresh
-    """
 
-    MEMORY_LENGTH_BYTES = 4096
+    PROGRAM_COUNTER_START = 0x200
+    PROGRAM_MEMORY_LENGTH = 0xE9F
     STACK_LENGTH_BYTES = 48
     V_REGISTERS_LENGTH_BYTES = 16
     PRELOADED_SPRITES = {
@@ -35,14 +27,15 @@ class Memory:
     }
 
     def __init__(self):
-        self.program_memory = [0x00] * 0xE9F
+        self.program_memory = [0x00] * self.PROGRAM_MEMORY_LENGTH
         self.stack = []
-        self.program_counter = 0x200
         self.v_registers = [0x00] * self.V_REGISTERS_LENGTH_BYTES
         self.i_register = None
+        self.program_counter = self.PROGRAM_COUNTER_START
         self._delay_timer = 0
         self._delay_timer_mutex = Lock()
-        self.sound_timer = None
+        self._sound_timer = 0
+        self._sound_timer_mutex = Lock()
         self._load_digit_sprites()
 
     def _load_digit_sprites(self):
@@ -74,7 +67,7 @@ class Memory:
         return [self.i_register + index for index in range(0, offset)]
 
     def load_rom(self, rom_bytes):
-        memory_index = 0x200
+        memory_index = self.PROGRAM_COUNTER_START
 
         for rom_byte in rom_bytes:
             self.program_memory[memory_index] = rom_byte
@@ -88,6 +81,14 @@ class Memory:
 
         self._delay_timer_mutex.release()
 
+    def decrement_sound_timer(self):
+        self._sound_timer_mutex.acquire()
+
+        if self._sound_timer > 0:
+            self._sound_timer -= 1
+
+        self._sound_timer_mutex.release()
+
     def set_delay_timer_to_v_value(self, v_index):
         self._delay_timer_mutex.acquire()
         self._delay_timer = self.v_registers[v_index]
@@ -97,3 +98,8 @@ class Memory:
         self._delay_timer_mutex.acquire()
         self.v_registers[v_index] = self._delay_timer
         self._delay_timer_mutex.release()
+
+    def set_sound_timer_to_v_value(self, v_index):
+        self._sound_timer_mutex.acquire()
+        self._sound_timer = self.v_registers[v_index]
+        self._sound_timer_mutex.release()
