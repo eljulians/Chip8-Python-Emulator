@@ -175,7 +175,7 @@ class Chip8:
         self.memory.increment_program_counter()
 
     def _fx18(self, vx_index):
-        self.memory.sound_timer = self.memory.v_registers[vx_index]
+        self.memory.set_sound_timer_to_v_value(vx_index)
         self.memory.increment_program_counter()
 
     def _fx1e(self, vx_index):

@@ -1,14 +1,17 @@
 language: python
 
 python:
+  - "3.5"
+  - "3.6"
   - "3.7"
-  - "3.8-dev"
   - "nightly"
 
+dist: xenial
+sudo: true
+
 install:
-  - "pip install pipenv "
+  - "pip install pipenv coveralls"
   - "pipenv sync"
-  - "pip install coveralls"
 
 script: pipenv run tests
 
