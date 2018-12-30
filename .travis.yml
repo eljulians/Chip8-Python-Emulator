@@ -9,7 +9,7 @@ sudo: true
 
 install:
   - "pip install pipenv coveralls"
-  - "pipenv install --dev"
+  - "pipenv sync"
 
 script: pipenv run tests
 
